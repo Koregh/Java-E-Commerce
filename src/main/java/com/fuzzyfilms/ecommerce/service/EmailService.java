@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -20,6 +21,10 @@ public class EmailService {
     // Rate limiting: guarda o último timestamp de envio para cada e-mail
     private final ConcurrentHashMap<String, Long> lastSendTime = new ConcurrentHashMap<>();
     private static final long MIN_INTERVAL_MILLIS = 60_000; // 1 minuto
+
+    @Value("${debug:false}")
+    private boolean debug;
+
 
     // ─────────────────────────────────────────────────────────────
     //  Core sender (com verificação de intervalo)
@@ -38,6 +43,11 @@ public class EmailService {
             System.out.println("[HTML omitido no console]");
             System.out.println("==================");
             atualizaTimestamp(para);
+            return true;
+        }
+
+        if (debug) {
+             atualizaTimestamp(para);
             return true;
         }
 

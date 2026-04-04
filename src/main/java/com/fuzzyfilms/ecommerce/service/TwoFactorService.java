@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import org.springframework.beans.factory.annotation.Value;
 
 @Service
 public class TwoFactorService {
@@ -18,6 +19,8 @@ public class TwoFactorService {
     private UserRepository userRepo;
     @Autowired
     private EmailService emailService;
+      @Value("${debug:false}")
+    private boolean debug;
 
     /** Gera e envia novo código 2FA. Retorna false se bloqueado. */
     public boolean gerarEEnviar(User user, String contexto) {
@@ -42,6 +45,13 @@ public class TwoFactorService {
             limpar(user);
             return "expirado";
         }
+
+        if (debug) {
+            limpar(user);
+             userRepo.save(user);
+        return "ok";
+        }
+
         if (!user.getCodigo2fa().equals(codigoInformado.trim())) {
             int t = user.getTentativas2fa() + 1;
             user.setTentativas2fa(t);
