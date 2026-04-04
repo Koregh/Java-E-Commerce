@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cadastro — FUZZI FILMS</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+      <link rel="icon" type="image/png" th:href="@{/images/logo.png}">
+</head>
+<body>
+
+<div class="auth-page">
+    <div class="auth-card">
+
+        <a href="/" class="brand">FUZZI FILMS</a>
+        <h1>Criar conta</h1>
+
+        <ul class="flash-list" th:if="${erro}">
+            <li class="error" th:text="${erro}"></li>
+        </ul>
+
+        <ul class="flash-list" th:if="${success}">
+            <li class="success" th:text="${success}"></li>
+        </ul>
+
+        <form method="POST" th:action="@{/cadastro}" novalidate>
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+            <div class="field">
+                <label for="nome">Nome completo</label>
+                <input id="nome" type="text" name="nome"
+                       placeholder="Seu nome"
+                       required maxlength="100" autocomplete="name">
+            </div>
+
+            <div class="field">
+                <label for="email">E-mail</label>
+                <input id="email" type="email" name="email"
+                       placeholder="voce@email.com"
+                       required maxlength="254" autocomplete="email">
+            </div>
+
+            <div class="field">
+                <label for="senha">Senha</label>
+                <input id="senha" type="password" name="senha"
+                       placeholder="Mín. 8 chars, maiúscula, número e símbolo"
+                       required minlength="8" maxlength="254"
+                       autocomplete="new-password">
+            </div>
+
+            <div class="field">
+                <label for="confirmar">Confirmar senha</label>
+                <input id="confirmar" type="password" name="confirmar"
+                       placeholder="Repita a senha"
+                       required minlength="8" maxlength="254"
+                       autocomplete="new-password">
+            </div>
+
+            <div class="field" style="margin-bottom:10px;">
+                <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:13px;color:var(--text-muted);font-weight:400;">
+                   <input type="checkbox" id="lgpd" name="aceiteLgpd" required
+                           style="width:16px;height:16px;margin-top:2px;flex-shrink:0;accent-color:var(--accent);">
+                    <span>
+                        Li e concordo com a
+                        <a href="/privacidade" target="_blank" onclick="event.stopPropagation()">
+                            Política de Privacidade
+                        </a>.
+                    </span>
+                </label>
+            </div>
+
+            <button id="btnCadastro" type="submit" class="btn btn-primary" style="width:100%;margin-top:8px;" disabled>
+                Criar conta
+            </button>
+        </form>
+
+        <p class="footer-link">
+            Já tem conta? <a href="/login">Entrar</a>
+        </p>
+    </div>
+</div>
+
+<script>
+const checkbox = document.getElementById("lgpd");
+const botao    = document.getElementById("btnCadastro");
+checkbox.addEventListener("change", () => { botao.disabled = !checkbox.checked; });
+</script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Termos e Condições — FUZZI FILMS</title>
+      <link rel="icon" type="image/png" th:href="@{/images/logo.png}">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <style>
+        .terms-page { max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
+        .terms-page h1 { font-size: 26px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+        .terms-page .updated { font-size: 13px; color: var(--text-muted); margin-bottom: 40px; }
+        .terms-page h2 { font-size: 16px; font-weight: 600; color: var(--text); margin: 36px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+        .terms-page p { font-size: 14px; color: var(--text-muted); line-height: 1.75; margin-bottom: 12px; }
+        .terms-page ul { margin: 8px 0 12px 20px; }
+        .terms-page ul li { font-size: 14px; color: var(--text-muted); line-height: 1.75; margin-bottom: 4px; }
+        .terms-page strong { color: var(--text); }
+        .info-box { background: var(--accent-subtle); border-left: 3px solid var(--accent); border-radius: var(--radius-sm); padding: 14px 16px; margin: 24px 0; }
+        .info-box p { margin: 0; color: var(--accent); font-size: 13px; }
+        .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--accent); text-decoration: none; margin-bottom: 32px; }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+<div class="terms-page">
+    <a href="/" class="back-link">&#8592; Voltar à loja</a>
+
+    <h1>Termos e Condições de Uso</h1>
+    <p class="updated">Última atualização: abril de 2026</p>
+
+    <div class="info-box">
+        <p>Ao criar uma conta ou utilizar a plataforma FUZZI FILMS, você concorda integralmente com estes termos. Se não concordar, não utilize nossos serviços.</p>
+    </div>
+
+    <h2>1. Sobre a plataforma</h2>
+    <p>A <strong>FUZZI FILMS</strong> é uma loja virtual especializada em produtos autorais, de películas automotivas e itens relacionados. Todos os produtos comercializados são de nossa própria autoria ou licenciados. Atuamos diretamente como vendedores, sendo responsáveis por todo o processo de venda, desde o anúncio até a entrega.</p>
+
+    <h2>2. Produtos e responsabilidade da loja</h2>
+    <p>A FUZZI FILMS é a única responsável pelos produtos anunciados, garantindo:</p>
+    <ul>
+        <li>Que os produtos são originais, lícitos e não infringem direitos de terceiros.</li>
+        <li>Que as descrições, preços, estoques e imagens são verdadeiros.</li>
+        <li>Cumprimento da legislação aplicável (Código de Defesa do Consumidor, tributação, etc.).</li>
+        <li>Realização da postagem dentro do prazo informado.</li>
+        <li>Arcar com custos de devolução, reembolso ou troca em caso de produto com defeito ou não conforme.</li>
+    </ul>
+
+    <h2>3. Compra e pagamento</h2>
+    <p>O comprador deve:</p>
+    <ul>
+        <li>Fornecer endereço de entrega válido e CPF correto.</li>
+        <li>Efetuar o pagamento através dos meios disponibilizados na plataforma (PIX, cartão de crédito via Mercado Pago).</li>
+        <li>Respeitar as políticas de troca e devolução da loja.</li>
+    </ul>
+    <p>Em caso de não recebimento do produto ou vício, o comprador deve entrar em contato diretamente com nosso suporte através do e-mail <strong>contato@fuzzyfilms.com</strong>.</p>
+
+    <h2>4. Preços e fretes</h2>
+    <p>Os preços são definidos pela FUZZI FILMS e podem ser alterados a qualquer momento. O frete é calculado dinamicamente com base no CEP do comprador e nas opções de entrega escolhidas. Estimativas de prazo são apenas indicativas e não constituem garantia.</p>
+
+    <h2>5. Trocas e devoluções</h2>
+    <p>O Código de Defesa do Consumidor (Lei 8.078/90) garante ao comprador o direito de arrependimento em até 7 dias corridos a partir do recebimento do produto (para compras fora do estabelecimento comercial). O vendedor deve reembolsar o valor integral, incluindo o frete.</p>
+    <p>Em caso de produto com defeito, o vendedor é obrigado a resolver o problema (troca, reparo ou reembolso) no prazo de 30 dias. A FUZZI FILMS pode mediar conflitos, mas não assume responsabilidade por produtos defeituosos.</p>
+
+    <h2>6. Conduta proibida</h2>
+    <p>É expressamente proibido:</p>
+    <ul>
+        <li>Anunciar produtos ilegais, falsificados, que violem direitos autorais ou propriedade intelectual.</li>
+        <li>Praticar fraudes, spam, phishing ou qualquer atividade maliciosa.</li>
+        <li>Publicar conteúdo ofensivo, difamatório, obsceno ou discriminatório.</li>
+        <li>Tentar burlar os mecanismos de segurança da plataforma (2FA, rate limiting).</li>
+        <li>Utilizar robôs, crawlers ou ferramentas automáticas para extrair dados sem autorização.</li>
+    </ul>
+    <p>O descumprimento pode resultar em advertência, suspensão temporária ou cancelamento definitivo da conta, além de medidas legais cabíveis.</p>
+
+    <h2>7. Propriedade intelectual</h2>
+    <p>O código-fonte, design, logotipo, nome "FUZZI FILMS" e demais elementos visuais da plataforma são de nossa propriedade ou licenciados. Você não pode reproduzir, distribuir ou modificar sem autorização prévia por escrito. Os produtos anunciados pertencem aos respectivos vendedores, que são responsáveis por eventuais direitos autorais de terceiros.</p>
+
+    <h2>8. Limitação de responsabilidade</h2>
+    <p>Em nenhum caso a FUZZI FILMS será responsabilizada por danos indiretos, lucros cessantes, perda de dados ou qualquer outra perda decorrente do uso da plataforma, salvo em caso de dolo ou culpa grave. Nosso limite máximo de responsabilidade, se aplicável, é o valor total das comissões pagas nos últimos 12 meses.</p>
+
+    <h2>9. Suspensão e rescisão</h2>
+    <p>Podemos suspender ou encerrar sua conta imediatamente se você violar estes termos. Em caso de encerramento, você perderá o acesso aos seus dados e produtos cadastrados. Você pode encerrar sua conta a qualquer momento através da opção "Excluir conta" em sua página de perfil.</p>
+
+    <h2>10. Disposições gerais</h2>
+    <ul>
+        <li>Estes termos são regidos pelas leis brasileiras, com foro exclusivo na comarca de São Paulo/SP, salvo disposição legal em contrário.</li>
+        <li>Se qualquer cláusula for considerada inválida, as demais permanecerão em vigor.</li>
+        <li>Alterações nestes termos serão comunicadas com antecedência por e-mail ou aviso na plataforma.</li>
+    </ul>
+
+    <h2>11. Contato</h2>
+    <p>Em caso de dúvidas sobre estes Termos e Condições, entre em contato pelo e-mail: <strong>contato@fuzzyfilms.com</strong>.</p>
+</div>
+<div th:replace="fragments/theme :: themeScript"></div>
+</body>
+</html>

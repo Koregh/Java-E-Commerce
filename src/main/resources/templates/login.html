@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Entrar — FUZZI FILMS</title>
+      <link rel="icon" type="image/png" th:href="@{/images/logo.png}">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<div class="auth-page">
+    <div class="auth-card">
+        <a href="/" class="brand">FUZZI FILMS</a>
+        <h1>Entrar na conta</h1>
+
+        <ul class="flash-list" th:if="${erro}">
+            <li class="error" th:text="${erro}"></li>
+        </ul>
+        <ul class="flash-list" th:if="${sucesso}">
+            <li class="success" th:text="${sucesso}"></li>
+        </ul>
+        <ul class="flash-list" th:if="${param.logout}">
+            <li class="success">Você saiu da conta com sucesso.</li>
+        </ul>
+        <ul class="flash-list" th:if="${info}">
+            <li class="info" th:text="${info}"></li>
+        </ul>
+
+        <form method="POST" th:action="@{/login/auth}" class="loading-form">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <input type="hidden" name="redirect_url" value="/"/>
+            <div class="field">
+                <label for="username">E-mail</label>
+                <input id="username" type="email" name="username"
+                       placeholder="voce@email.com"
+                       required maxlength="254" autocomplete="email">
+            </div>
+            <div class="field">
+                <label for="password">Senha</label>
+                <input id="password" type="password" name="password"
+                       placeholder="••••••••"
+                       required maxlength="254" autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;margin-top:4px;padding:11px;">
+                Entrar
+            </button>
+        </form>
+
+        <a href="/" class="btn btn-secondary" style="width:100%;padding:11px;margin-top:8px;text-align:center;display:block;">
+            Voltar para a loja
+        </a>
+
+        <p class="footer-link">Não tem conta? <a href="/cadastro">Cadastre-se</a></p>
+        <p class="footer-link"><a href="/esqueci-senha">Esqueceu sua senha?</a></p>
+    </div>
+</div>
+
+<div th:replace="fragments/theme :: themeScript"></div>
+</body>
+</html>

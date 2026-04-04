@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Minha Conta — FUZZI FILMS</title>
+      <link rel="icon" type="image/png" th:href="@{/images/logo.png}">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <style>
+        .account-page {
+            max-width: 640px;
+            margin: 36px auto;
+            padding: 0 24px 80px;
+        }
+
+        /* ── Header ── */
+        .account-header { margin-bottom: 32px; }
+        .account-header h1 {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 6px;
+            letter-spacing: -0.2px;
+        }
+        .account-sub {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 300;
+        }
+
+        /* ── Section card ── */
+        .section-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 22px 24px;
+            margin-bottom: 14px;
+            box-shadow: var(--shadow-xs);
+        }
+        .section-card-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--border);
+        }
+        .section-card-head h2 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            margin: 0;
+        }
+        .section-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            flex-shrink: 0;
+            background: var(--accent-subtle);
+            color: var(--accent);
+        }
+        .section-icon.success { background: var(--success-bg); color: var(--success); }
+        .section-icon.danger  { background: var(--danger-bg);  color: var(--danger); }
+        .section-icon.info    { background: var(--info-bg);    color: var(--info); }
+
+        /* ── Forms ── */
+        .section-form { display: flex; flex-direction: column; }
+        .section-form .field { margin-bottom: 13px; }
+        .section-form .field:last-of-type { margin-bottom: 16px; }
+
+        .field-hint {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+            line-height: 1.55;
+            font-weight: 300;
+        }
+        .field-hint strong { color: var(--text); font-weight: 500; }
+
+        .warn-inline {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            background: var(--warn-bg);
+            color: var(--warn);
+            border-radius: 20px;
+            padding: 3px 10px;
+            font-weight: 400;
+        }
+
+        /* ── Endereço ── */
+        .endereco-info { margin-bottom: 14px; }
+        .endereco-info p {
+            font-size: 13.5px;
+            color: var(--text);
+            line-height: 1.6;
+            font-weight: 400;
+        }
+        .endereco-info p + p { margin-top: 2px; }
+        .endereco-empty {
+            font-size: 13.5px;
+            color: var(--text-muted);
+            font-weight: 300;
+            margin-bottom: 14px;
+        }
+
+        /* ── Export ── */
+        .export-info {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.65;
+            font-weight: 300;
+            margin-bottom: 16px;
+        }
+        .export-info strong { color: var(--text); font-weight: 500; }
+
+        /* ── Danger zone ── */
+        .danger-zone { border-color: #fca5a5; }
+        .danger-zone .section-card-head h2 { color: var(--danger); }
+
+        .delete-warning {
+            background: var(--danger-bg);
+            border: 1px solid #fca5a5;
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            font-size: 13px;
+            color: var(--danger);
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+        .confirm-block { display: none; margin-top: 12px; }
+        .confirm-block.visible { display: block; }
+
+        /* ── Footer note ── */
+        .privacy-note {
+            font-size: 12px;
+            color: var(--text-light);
+            text-align: center;
+            margin-top: 24px;
+            line-height: 1.6;
+            font-weight: 300;
+        }
+        .privacy-note a { color: var(--accent); text-decoration: none; }
+        .privacy-note a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<header class="navbar">
+    <a href="/" class="logo">FUZZI FILMS</a>
+    <div class="nav-actions">
+        <a href="/" class="btn btn-ghost">&#8592; Loja</a>
+        <a href="/pedidos" class="btn btn-ghost">Meus Pedidos</a>
+        <form method="post" th:action="@{/logout}" sec:authorize="isAuthenticated()" style="display:inline;">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button type="submit" class="btn btn-danger">Sair</button>
+        </form>
+        <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema">🌙</button>
+    </div>
+</header>
+
+<div class="account-page">
+
+    <div class="account-header">
+        <h1>Minha Conta</h1>
+        <div class="account-sub">
+            Gerencie seus dados
+            <span class="cargo-badge" th:classappend="'cargo-' + ${usuario.cargo}"
+                  th:text="${usuario.cargo}">CLIENTE</span>
+        </div>
+    </div>
+
+    <ul class="flash-list" th:if="${sucesso}" style="margin-bottom:20px;">
+        <li class="success" th:text="${sucesso}"></li>
+    </ul>
+    <ul class="flash-list" th:if="${erro}" style="margin-bottom:20px;">
+        <li class="error" th:text="${erro}"></li>
+    </ul>
+    <ul class="flash-list" th:if="${info}" style="margin-bottom:20px;">
+        <li class="info" th:text="${info}"></li>
+    </ul>
+
+    <!-- ── Dados pessoais ── -->
+    <div class="section-card">
+        <div class="section-card-head">
+            <div class="section-icon">👤</div>
+            <h2>Dados pessoais</h2>
+        </div>
+        <form method="POST" th:action="@{/minha-conta/atualizar}" class="section-form" novalidate>
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <div class="field">
+                <label for="nome">Nome completo</label>
+                <input id="nome" type="text" name="nome" th:value="${usuario.nome}"
+                       required maxlength="50" autocomplete="name">
+            </div>
+            <button type="submit" class="btn btn-primary" style="align-self:flex-start;padding:8px 18px;font-size:13px;">
+                Salvar nome
+            </button>
+        </form>
+    </div>
+
+    <!-- ── Alterar e-mail ── -->
+    <div class="section-card">
+        <div class="section-card-head">
+            <div class="section-icon">✉️</div>
+            <h2>Alterar e-mail</h2>
+        </div>
+        <p class="field-hint">
+            E-mail atual: <strong th:text="${emailMascarado}">email</strong><br>
+            <span class="warn-inline">Exige confirmação por código de 6 dígitos</span>
+        </p>
+        <form method="POST" th:action="@{/minha-conta/email/solicitar}" class="section-form" novalidate>
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <div class="field">
+                <label for="email">Novo e-mail</label>
+                <input id="email" type="email" name="email" required maxlength="254"
+                       placeholder="novo@email.com" autocomplete="email">
+            </div>
+            <div class="field">
+                <label for="senha_email">Senha atual</label>
+                <input id="senha_email" type="password" name="senha_atual" required maxlength="254"
+                       autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn btn-primary" style="align-self:flex-start;padding:8px 18px;font-size:13px;">
+                Alterar e-mail
+            </button>
+        </form>
+    </div>
+
+    <!-- ── Alterar senha ── -->
+    <div class="section-card">
+        <div class="section-card-head">
+            <div class="section-icon">🔒</div>
+            <h2>Alterar senha</h2>
+        </div>
+        <p class="field-hint">
+            <span class="warn-inline">Exige confirmação por código de 6 dígitos</span>
+        </p>
+        <form method="POST" th:action="@{/minha-conta/senha/solicitar}" class="section-form" novalidate>
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <div class="field">
+                <label for="senha_atual">Senha atual</label>
+                <input id="senha_atual" type="password" name="senha_atual"
+                       required maxlength="254" autocomplete="current-password">
+            </div>
+            <div class="field">
+                <label for="nova_senha">Nova senha</label>
+                <input id="nova_senha" type="password" name="nova_senha"
+                       required minlength="8" maxlength="254" autocomplete="new-password"
+                       placeholder="Mínimo 8 caracteres, 1 letra e 1 número">
+            </div>
+            <div class="field">
+                <label for="confirmar_senha">Confirmar nova senha</label>
+                <input id="confirmar_senha" type="password" name="confirmar_senha"
+                       required minlength="8" maxlength="254" autocomplete="new-password">
+            </div>
+            <button type="submit" class="btn btn-primary" style="align-self:flex-start;padding:8px 18px;font-size:13px;">
+                Alterar senha
+            </button>
+        </form>
+    </div>
+
+    <!-- ── Endereço ── -->
+    <div class="section-card">
+        <div class="section-card-head">
+            <div class="section-icon info">📍</div>
+            <h2>Endereço de entrega</h2>
+        </div>
+        <div th:if="${endereco != null}">
+            <div class="endereco-info">
+                <p th:text="${endereco.endereco} + ', ' + ${endereco.numero}">Rua, 123</p>
+                <p th:if="${endereco.complemento}" th:text="${endereco.complemento}"></p>
+                <p th:text="${endereco.cep} + ' · CPF: ' + ${endereco.cpfMascarado}"></p>
+                <p th:if="${endereco.horarioEntrega}"
+                   th:text="'Horário preferido: ' + ${endereco.horarioEntrega}"></p>
+            </div>
+            <a href="/minha-conta/endereco" class="btn btn-ghost" style="padding:8px 18px;font-size:13px;">
+                Editar endereço
+            </a>
+        </div>
+        <div th:unless="${endereco != null}">
+            <p class="endereco-empty">Nenhum endereço de entrega cadastrado.</p>
+            <a href="/minha-conta/endereco" class="btn btn-primary" style="padding:8px 18px;font-size:13px;">
+                Cadastrar endereço
+            </a>
+        </div>
+    </div>
+
+    <!-- ── Exportar dados ── -->
+    <div class="section-card">
+        <div class="section-card-head">
+            <div class="section-icon success">↓</div>
+            <h2>Exportar meus dados</h2>
+        </div>
+        <p class="export-info">
+            Conforme o <strong>Art. 18, V da LGPD</strong>, você tem direito à portabilidade dos seus dados.
+            O arquivo gerado contém todos os seus dados armazenados em formato JSON.
+        </p>
+        <a href="/minha-conta/exportar" class="btn btn-ghost" style="padding:8px 18px;font-size:13px;">
+            Baixar meus dados (JSON)
+        </a>
+    </div>
+
+    <!-- ── Excluir conta ── -->
+    <div class="section-card danger-zone">
+        <div class="section-card-head">
+            <div class="section-icon danger">✕</div>
+            <h2>Excluir conta</h2>
+        </div>
+        <div class="delete-warning">
+            <strong>Atenção:</strong> Esta ação é permanente e irreversível. Todos os seus dados pessoais
+            serão removidos conforme o Art. 18, VI da LGPD.
+        </div>
+        <button type="button" class="btn btn-danger" style="padding:8px 18px;font-size:13px;"
+                onclick="document.getElementById('confirm-delete').classList.toggle('visible')">
+            Excluir minha conta
+        </button>
+        <div id="confirm-delete" class="confirm-block">
+            <form method="POST" th:action="@{/minha-conta/deletar}" class="section-form" style="margin-top:12px;">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <div class="field">
+                    <label for="senha_confirmacao">Confirme sua senha para excluir</label>
+                    <input id="senha_confirmacao" type="password" name="senha_confirmacao"
+                           required maxlength="254" autocomplete="current-password"
+                           placeholder="Digite sua senha atual">
+                </div>
+                <button type="submit" class="btn btn-danger" style="width:100%;padding:11px;font-size:14px;">
+                    Confirmar exclusão permanente
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <p class="privacy-note">
+        Seus dados são tratados conforme nossa <a href="/privacidade">Política de Privacidade</a>.
+        Dúvidas? <a href="mailto:privacidade@fuzzyfilms.com">privacidade@fuzzyfilms.com</a>
+    </p>
+
+</div>
+
+<div th:replace="fragments/theme :: themeScript"></div>
+</body>
+</html>

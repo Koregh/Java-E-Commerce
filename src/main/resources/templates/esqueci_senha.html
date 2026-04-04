@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Esqueci minha senha — FUZZI FILMS</title>
+      <link rel="icon" type="image/png" th:href="@{/images/logo.png}">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<div class="auth-page">
+    <div class="auth-card">
+        <a href="/" class="brand">FUZZI FILMS</a>
+        <h1>Recuperar senha</h1>
+        <p style="font-size:13px; color:var(--text-muted); text-align:center; margin-bottom:20px;">
+            Informe seu e-mail para receber um código de verificação.
+        </p>
+
+        <ul class="flash-list" th:if="${erro}"><li class="error" th:text="${erro}"></li></ul>
+        <ul class="flash-list" th:if="${info}"><li class="info" th:text="${info}"></li></ul>
+
+        <form method="POST" th:action="@{/esqueci-senha}" class="loading-form">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <div class="field">
+                <label for="email">Seu e-mail</label>
+                <input id="email" type="email" name="email" required maxlength="254" autocomplete="email">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;padding:11px;">Enviar código</button>
+        </form>
+        <p class="footer-link"><a href="/login">← Voltar ao login</a></p>
+    </div>
+</div>
+<div th:replace="fragments/theme :: themeScript"></div>
+</body>
+</html>

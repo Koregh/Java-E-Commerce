@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Trocas e Devoluções — FUZZI FILMS</title>
+      <link rel="icon" type="image/png" th:href="@{/images/logo.png}">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <style>
+        .returns-page { max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
+        .returns-page h1 { font-size: 26px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+        .returns-page .updated { font-size: 13px; color: var(--text-muted); margin-bottom: 40px; }
+        .returns-page h2 { font-size: 16px; font-weight: 600; color: var(--text); margin: 36px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+        .returns-page p { font-size: 14px; color: var(--text-muted); line-height: 1.75; margin-bottom: 12px; }
+        .returns-page ul { margin: 8px 0 12px 20px; }
+        .returns-page ul li { font-size: 14px; color: var(--text-muted); line-height: 1.75; margin-bottom: 4px; }
+        .returns-page strong { color: var(--text); }
+        .info-box { background: var(--accent-subtle); border-left: 3px solid var(--accent); border-radius: var(--radius-sm); padding: 14px 16px; margin: 24px 0; }
+        .info-box p { margin: 0; color: var(--accent); font-size: 13px; }
+        .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--accent); text-decoration: none; margin-bottom: 32px; }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+<div class="returns-page">
+    <a href="/" class="back-link">&#8592; Voltar à loja</a>
+
+    <h1>Trocas e Devoluções – Películas Automotivas</h1>
+    <p class="updated">Última atualização: abril de 2026</p>
+
+    <div class="info-box">
+        <p>Esta política explica os procedimentos para troca, devolução e reembolso de películas automotivas (insulfilm, proteção de pintura, etc.) compradas na FUZZI FILMS, em conformidade com o Código de Defesa do Consumidor (Lei 8.078/90).</p>
+    </div>
+
+    <h2>1. Direito de arrependimento</h2>
+    <p>O comprador tem o prazo de <strong>7 (sete) dias corridos</strong>, a contar da data de recebimento do produto, para desistir da compra (arrependimento), independentemente de justificativa, nos termos do Art. 49 do CDC. Este direito aplica-se apenas a compras realizadas fora do estabelecimento comercial (internet).</p>
+    <p>Para exercer o direito de arrependimento, o comprador deve entrar em contato através do e-mail <strong>trocas@fuzzyfilms.com</strong> ou pelo telefone (44) 99923-9590. O produto deve ser devolvido <strong>em sua embalagem original, sem sinais de uso ou instalação</strong>, acompanhado de todos os acessórios e documentos.</p>
+
+    <h2>2. Produto com defeito (vício)</h2>
+    <p>Se a película apresentar defeito de fabricação (bolhas, descascamento, descoloração anormal) ou não estiver conforme a descrição (cor, modelo, tamanho errado), o comprador tem o prazo de <strong>90 dias</strong> para reclamar, contados a partir do recebimento.</p>
+    <p>A FUZZI FILMS é obrigada a resolver o problema no prazo de <strong>30 dias</strong> (troca por produto equivalente, reembolso ou abatimento proporcional). Se não resolver, o comprador pode optar por:</p>
+    <ul>
+        <li>Troca por outro produto de mesmo valor ou similar.</li>
+        <li>Reembolso integral do valor pago (atualizado).</li>
+        <li>Abatimento proporcional do preço.</li>
+    </ul>
+
+    <h2>3. Produto entregue em desacordo</h2>
+    <p>Caso a película recebida seja diferente da anunciada (medida, tonalidade, modelo), o comprador tem direito à troca ou devolução imediata, arcando a FUZZI FILMS com os custos de frete de retirada e reenvio.</p>
+
+    <h2>4. Procedimento para solicitar troca ou devolução</h2>
+    <ul>
+        <li><strong>Passo 1:</strong> Acesse a página do pedido em "Meus Pedidos" e clique em "Solicitar troca/devolução" (se disponível) ou envie um e‑mail para <strong>trocas@fuzzyfilms.com</strong> com o número do pedido e fotos que comprovem o problema (defeito, produto errado).</li>
+        <li><strong>Passo 2:</strong> A FUZZI FILMS tem até 48 horas para responder e fornecer instruções para a devolução.</li>
+        <li><strong>Passo 3:</strong> Após o acordo, o comprador deve enviar o produto conforme orientado (correios com código de rastreio).</li>
+        <li><strong>Passo 4:</strong> A FUZZI FILMS processará o reembolso ou enviará o produto de substituição em até 30 dias após o recebimento da devolução.</li>
+    </ul>
+
+    <h2>5. Custos de frete em caso de devolução</h2>
+    <ul>
+        <li><strong>Arrependimento (7 dias):</strong> A FUZZI FILMS arca com o custo de frete de devolução e reembolsa integralmente o comprador (incluindo o frete pago na compra).</li>
+        <li><strong>Produto com defeito ou divergência:</strong> A FUZZI FILMS é responsável por todos os custos de frete (retirada e reenvio ou reembolso).</li>
+        <li><strong>Troca por motivo de gosto pessoal (cor, tonalidade) – não permitido:</strong> Não aceitamos troca por preferência estética após a compra; o comprador deve verificar as amostras disponíveis no site antes de finalizar o pedido.</li>
+    </ul>
+
+    <h2>6. Reembolso</h2>
+    <p>O reembolso será feito pelo mesmo meio de pagamento utilizado na compra, no prazo de até 7 dias úteis após o recebimento do produto devolvido (ou da solicitação de arrependimento, quando não houver devolução). Para compras com cartão de crédito, o estorno pode levar até duas faturas para aparecer, dependendo da administradora.</p>
+
+    <h2>7. Produtos que não podem ser devolvidos ou trocados</h2>
+    <p>Por questões de segurança e higiene, não aceitamos devolução ou troca de películas que já tenham sido instaladas (parcial ou totalmente), salvo se apresentarem defeito de fabricação comprovado. Também não aceitamos devolução de produtos personalizados (cortes sob medida) – salvo erro de envio.</p>
+
+    <h2>8. Responsabilidade da FUZZI FILMS</h2>
+    <p>A FUZZI FILMS é a única responsável pela venda e qualidade das películas comercializadas. Garantimos que todos os produtos são originais e possuem procedência comprovada. Em caso de defeito, arcaremos com os custos de troca conforme descrito acima.</p>
+
+    <h2>9. Contato para dúvidas</h2>
+    <p>Se você tem dúvidas sobre esta política, entre em contato conosco pelo e‑mail <strong>trocas@fuzzyfilms.com</strong> ou através da nossa página de <a href="/contato" style="color:var(--accent)">Contato</a>.</p>
+</div>
+<div th:replace="fragments/theme :: themeScript"></div>
+</body>
+</html>

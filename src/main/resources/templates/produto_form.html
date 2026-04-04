@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${produto != null} ? 'Editar Produto — FUZZI FILMS' : 'Novo Produto — FUZZI FILMS'">Produto</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <style>
+        .produto-form-page {
+            max-width: 600px;
+            margin: 36px auto;
+            padding: 0 24px 80px;
+        }
+
+        /* ── Breadcrumb ── */
+        .form-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            font-weight: 300;
+        }
+        .form-breadcrumb a { color: var(--text-muted); text-decoration: none; transition: color var(--transition); }
+        .form-breadcrumb a:hover { color: var(--text); }
+        .form-breadcrumb .sep { color: var(--text-light); }
+
+        /* ── Card ── */
+        .form-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            padding: 32px;
+        }
+        .form-card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 24px;
+            letter-spacing: -0.2px;
+        }
+
+        .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+        /* ── Tabs ── */
+        .tabs {
+            display: flex;
+            border-bottom: 1.5px solid var(--border);
+            margin-bottom: 26px;
+            gap: 0;
+        }
+        .tab-btn {
+            padding: 9px 20px;
+            font-size: 13.5px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: var(--text-muted);
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1.5px;
+            transition: color var(--transition), border-color var(--transition);
+            font-family: var(--font-body);
+        }
+        .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* ── Upload ── */
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius-sm);
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+            background: var(--surface-2);
+            transition: border-color var(--transition), background var(--transition);
+        }
+        .upload-area:hover { border-color: var(--accent); background: var(--accent-subtle); }
+        .upload-area input[type=file] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+        .upload-text { font-size: 13.5px; color: var(--text-muted); margin-top: 4px; }
+        .upload-text strong { color: var(--accent); }
+        .upload-hint { font-size: 11.5px; color: var(--text-light); margin-top: 4px; }
+
+        .current-img {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        .current-img img {
+            width: 44px;
+            height: 44px;
+            object-fit: contain;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--surface-2);
+        }
+
+        #preview-wrap { display: none; margin-top: 10px; }
+        #preview-wrap img {
+            width: 72px;
+            height: 72px;
+            object-fit: contain;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--surface-2);
+        }
+
+        .char-count { font-size: 11px; color: var(--text-light); text-align: right; margin-top: 4px; }
+
+        /* ── Transport fieldsets ── */
+        .transport-group {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            margin-bottom: 14px;
+        }
+        .transport-group legend {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            padding: 0 6px;
+        }
+
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 5px 0;
+        }
+        .toggle-row label { font-size: 13.5px; color: var(--text); }
+
+        .toggle { position: relative; display: inline-block; width: 40px; height: 22px; flex-shrink: 0; }
+        .toggle input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            inset: 0;
+            background: var(--border-mid);
+            border-radius: 22px;
+            transition: 0.25s;
+            cursor: pointer;
+        }
+        .slider:before {
+            content: '';
+            position: absolute;
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 3px;
+            background: var(--surface);
+            border-radius: 50%;
+            transition: 0.25s;
+        }
+        input:checked + .slider { background: var(--accent); }
+        input:checked + .slider:before { transform: translateX(18px); }
+
+        .field-hint {
+            font-size: 11.5px;
+            color: var(--text-light);
+            margin-top: 6px;
+            line-height: 1.5;
+            font-weight: 300;
+        }
+
+        .hr-light { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
+
+        .horario-checks { display: flex; flex-direction: column; gap: 10px; margin-bottom: 6px; }
+        .horario-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13.5px;
+            color: var(--text);
+            cursor: pointer;
+        }
+        .horario-label input[type="checkbox"] {
+            width: 15px;
+            height: 15px;
+            accent-color: var(--accent);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        /* ── Status section ── */
+        .status-section {
+            margin-top: 22px;
+            padding-top: 22px;
+            border-top: 1px solid var(--border);
+        }
+        .status-section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+        .status-note {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            font-weight: 300;
+            margin-bottom: 12px;
+        }
+        .status-note strong { color: var(--text); font-weight: 500; }
+
+        .cancel-link {
+            display: block;
+            text-align: center;
+            margin-top: 14px;
+            font-size: 13px;
+            color: var(--text-muted);
+            text-decoration: none;
+        }
+        .cancel-link:hover { color: var(--text); }
+
+        @media (max-width: 500px) {
+            .field-row { grid-template-columns: 1fr; }
+            .form-card { padding: 22px 18px; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="navbar">
+    <a href="/" class="logo">FUZZI FILMS</a>
+    <div class="nav-actions">
+        <a href="/dashboard" class="btn btn-ghost">&#8592; Dashboard</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema">🌙</button>
+    </div>
+</header>
+
+<div class="produto-form-page">
+
+    <nav class="form-breadcrumb">
+        <a href="/">Loja</a>
+        <span class="sep">/</span>
+        <a href="/dashboard">Dashboard</a>
+        <span class="sep">/</span>
+        <span th:text="${produto != null} ? 'Editar produto' : 'Novo produto'">Produto</span>
+    </nav>
+
+    <div class="form-card">
+        <h1 class="form-card-title" th:text="${produto != null} ? 'Editar produto' : 'Novo produto'">Produto</h1>
+
+        <ul class="flash-list" th:if="${erro}" style="margin-bottom:18px;">
+            <li class="error" th:text="${erro}"></li>
+        </ul>
+
+        <form method="POST"
+              th:action="${produto != null} ? @{/produto/editar/{id}(id=${produto.id})} : @{/produto/adicionar}"
+              enctype="multipart/form-data"
+              novalidate
+              id="produto-form">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" type="button" onclick="switchTab('descricao', this)">Descrição</button>
+                <button class="tab-btn"        type="button" onclick="switchTab('transporte', this)">Transporte</button>
+            </div>
+
+            <!-- ════ ABA: DESCRIÇÃO ════ -->
+            <div class="tab-panel active" id="tab-descricao">
+
+                <div class="field">
+                    <label for="nome">Nome <span class="req">*</span></label>
+                    <input id="nome" type="text" name="nome"
+                           placeholder="Ex: Película fumê 5%"
+                           required maxlength="120"
+                           th:value="${produto != null} ? ${produto.nome} : ''">
+                </div>
+
+                <div class="field">
+                    <label for="descricao">
+                        Descrição
+                        <span style="color:var(--text-light);font-weight:300;font-size:12px;">(opcional)</span>
+                    </label>
+                    <textarea id="descricao" name="descricao"
+                              placeholder="Descreva o produto..."
+                              maxlength="500"
+                              oninput="updateCount(this)"
+                              th:text="${produto != null and produto.descricao != null} ? ${produto.descricao} : ''"></textarea>
+                    <div class="char-count"><span id="char-n">0</span>/500</div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field">
+                        <label for="preco">Preço (R$) <span class="req">*</span></label>
+                        <input id="preco" type="number" step="0.01" name="preco"
+                               placeholder="0,00" required min="0" max="1000000"
+                               th:value="${produto != null} ? ${produto.preco} : ''">
+                    </div>
+                    <div class="field">
+                        <label for="estoque">Estoque <span class="req">*</span></label>
+                        <input id="estoque" type="number" step="1" name="estoque"
+                               placeholder="0" required min="0" max="1000000"
+                               th:value="${produto != null} ? ${produto.estoque} : ''">
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label>
+                        Imagem
+                        <span class="req" th:unless="${produto != null}">*</span>
+                        <span style="color:var(--text-light);font-weight:300;font-size:12px;"
+                              th:if="${produto != null}">(deixe vazio para manter)</span>
+                    </label>
+                    <div class="current-img" th:if="${produto != null and produto.imagem != null}">
+                        <img th:src="@{/uploads/images/__${produto.imagem}__}" alt="Atual">
+                        <span>Imagem atual</span>
+                    </div>
+                    <div class="upload-area">
+                        <input type="file" name="imagem"
+                               accept="image/png,image/jpeg,image/webp"
+                               th:required="${produto == null}"
+                               onchange="preview(this)">
+                        <div class="upload-text"><strong>Clique</strong> ou arraste a imagem aqui</div>
+                        <div class="upload-hint">PNG · JPG · WEBP — máx. 5MB</div>
+                    </div>
+                    <div id="preview-wrap"><img id="preview-img" src="" alt="Preview"></div>
+                </div>
+
+            </div>
+
+            <!-- ════ ABA: TRANSPORTE ════ -->
+            <div class="tab-panel" id="tab-transporte">
+
+                <fieldset class="transport-group">
+                    <legend>Tipo de frete</legend>
+                    <div class="field" style="margin: 8px 0 0;">
+                        <select name="tipoFrete" id="tipoFrete" onchange="toggleFrete(this.value)">
+                            <option value="GRATIS"
+                                th:selected="${produto != null and produto.tipoFrete != null and produto.tipoFrete.name() == 'GRATIS'}">
+                                Frete grátis
+                            </option>
+                            <option value="FIXO"
+                                th:selected="${produto != null and produto.tipoFrete != null and produto.tipoFrete.name() == 'FIXO'}">
+                                Frete fixo
+                            </option>
+                        </select>
+                    </div>
+                    <div id="frete-valor-wrap"
+                         style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+                        <div class="field" style="margin:0;">
+                            <label for="valorFrete">Valor do frete (R$) <span class="req">*</span></label>
+                            <input id="valorFrete" type="number" step="0.01" name="valorFrete"
+                                   placeholder="0,00" min="0" max="9999"
+                                   th:value="${produto != null} ? ${produto.valorFrete} : ''">
+                        </div>
+                    </div>
+                    <p class="field-hint" style="margin-top:8px;">Deixe em "Padrão global" para usar a configuração definida em Admin → Frete.</p>
+                </fieldset>
+
+                <fieldset class="transport-group">
+                    <legend>Opções de entrega</legend>
+
+                    <div class="toggle-row">
+                        <label for="aceitaEntregaUrgente">Aceita entrega urgente</label>
+                        <label class="toggle">
+                            <input type="checkbox" id="aceitaEntregaUrgente" name="aceitaEntregaUrgente"
+                                   value="true"
+                                   th:checked="${produto != null and produto.aceitaEntregaUrgente}">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <p class="field-hint">Permite urgência no checkout (taxa extra aplicada).</p>
+
+                    <hr class="hr-light">
+
+                    <div class="toggle-row">
+                        <label for="aceitaAgendamento">Aceita agendamento de entrega</label>
+                        <label class="toggle">
+                            <input type="checkbox" id="aceitaAgendamento" name="aceitaAgendamento"
+                                   value="true"
+                                   th:checked="${produto != null and produto.aceitaAgendamento}">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <p class="field-hint">Permite que o cliente escolha data e horário de entrega.</p>
+                </fieldset>
+
+                <fieldset class="transport-group">
+                    <legend>Horários disponíveis</legend>
+                    <div class="horario-checks">
+                        <label class="horario-label">
+                            <input type="checkbox" name="horariosEntrega" value="08:00–12:00"
+                                th:checked="${produto != null and produto.horariosEntrega != null and #strings.contains(produto.horariosEntrega,'08:00–12:00')}">
+                            Manhã (08:00 – 12:00)
+                        </label>
+                        <label class="horario-label">
+                            <input type="checkbox" name="horariosEntrega" value="12:00–18:00"
+                                th:checked="${produto != null and produto.horariosEntrega != null and #strings.contains(produto.horariosEntrega,'12:00–18:00')}">
+                            Tarde (12:00 – 18:00)
+                        </label>
+                        <label class="horario-label">
+                            <input type="checkbox" name="horariosEntrega" value="18:00–22:00"
+                                th:checked="${produto != null and produto.horariosEntrega != null and #strings.contains(produto.horariosEntrega,'18:00–22:00')}">
+                            Noite (18:00 – 22:00)
+                        </label>
+                    </div>
+                    <p class="field-hint">Deixe todos desmarcados para aceitar qualquer horário definido pelo cliente.</p>
+                </fieldset>
+
+            </div>
+
+            <button type="submit" class="btn btn-primary"
+                    style="width:100%;padding:12px;font-size:15px;margin-top:8px;">
+                <span th:text="${produto != null} ? 'Salvar alterações' : 'Adicionar produto'">Salvar</span>
+            </button>
+        </form>
+
+        <!-- Status — só na edição, form separado -->
+        <div class="status-section" th:if="${produto != null}">
+            <p class="status-section-title">Status do produto</p>
+            <p class="status-note">
+                <strong>ATIVO</strong> = visível na loja ·
+                <strong>INATIVO</strong> = oculto temporariamente ·
+                <strong>SUSPENSO</strong> = removido por não conformidade
+            </p>
+            <form method="POST" th:action="@{/produto/{id}/status(id=${produto.id})}">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <div class="field" style="margin-bottom: 10px;">
+                    <select name="statusProduto">
+                        <option th:each="s : ${statusProdutos}"
+                                th:value="${s}"
+                                th:text="${s.name()}"
+                                th:selected="${s == produto.statusProduto}">ATIVO</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-ghost" style="width:100%;padding:10px;font-size:13.5px;">
+                    Atualizar status
+                </button>
+            </form>
+        </div>
+
+        <a href="/dashboard" class="cancel-link">Cancelar</a>
+    </div>
+</div>
+
+<script>
+    function toggleFrete(val) {
+        const wrap = document.getElementById("frete-valor-wrap");
+        const input = document.getElementById("valorFrete");
+        const show = val === "FIXO";
+        wrap.style.display = show ? "block" : "none";
+        input.required = show;
+    }
+
+    document.querySelector('form').addEventListener('submit', function(e) {
+    const fileInput = document.querySelector('input[name="imagem"]');
+    if (fileInput.files.length) {
+        const img = new Image();
+        img.onload = function() {
+            if (img.width !== img.height) {
+                alert('A imagem deve ser quadrada!');
+                e.preventDefault();
+            }
+        };
+        img.src = URL.createObjectURL(fileInput.files[0]);
+    }
+});
+
+    function switchTab(name, btn) {
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-' + name).classList.add('active');
+        btn.classList.add('active');
+    }
+
+    document.getElementById('produto-form').addEventListener('submit', function () {
+        const checks = [...document.querySelectorAll('input[name="horariosEntrega"]:checked')];
+        document.querySelectorAll('input[name="horariosEntrega"]').forEach(el => el.disabled = true);
+        const hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = 'horariosEntrega';
+        hidden.value = checks.map(c => c.value).join(',');
+        this.appendChild(hidden);
+    });
+
+    toggleFrete(document.getElementById('tipoFrete').value);
+
+    function updateCount(el) {
+        document.getElementById('char-n').textContent = el.value.length;
+    }
+    updateCount(document.getElementById('descricao'));
+
+    function preview(input) {
+        if (!input.files[0]) return;
+        const wrap = document.getElementById('preview-wrap');
+        const img  = document.getElementById('preview-img');
+        img.src = URL.createObjectURL(input.files[0]);
+        wrap.style.display = 'block';
+    }
+</script>
+
+<div th:replace="fragments/theme :: themeScript"></div>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Usuários — FUZZI FILMS</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <style>
+        .admin-page { max-width: 1000px; margin: 0 auto; padding: 32px 24px 80px; }
+
+        .admin-head { margin-bottom: 24px; }
+        .admin-head h1 { font-size: 20px; font-weight: 600; color: var(--text); margin-bottom: 4px; letter-spacing: -0.2px; }
+        .admin-head p  { font-size: 13px; color: var(--text-muted); font-weight: 300; }
+
+        .info-box {
+            background: var(--warn-bg);
+            border: 1px solid #fde68a;
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: var(--warn);
+            line-height: 1.55;
+        }
+
+        .user-info { display: flex; flex-direction: column; gap: 2px; }
+        .user-name  { font-size: 13.5px; font-weight: 500; color: var(--text); }
+        .user-email { font-size: 12px; color: var(--text-muted); font-weight: 300; }
+        .user-date  { font-size: 11px; color: var(--text-light); }
+
+        .cargo-form {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            align-items: flex-start;
+        }
+        .cargo-select {
+            font-family: var(--font-body);
+            font-size: 13px;
+            padding: 7px 10px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--surface-2);
+            color: var(--text);
+            cursor: pointer;
+            width: 100%;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+        .cargo-select:focus { border-color: var(--border-focus); outline: none; }
+
+        .cargo-email-input {
+            font-family: var(--font-body);
+            font-size: 12px;
+            padding: 7px 10px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--surface-2);
+            color: var(--text);
+            width: 100%;
+        }
+        .cargo-email-input:focus { border-color: var(--border-focus); outline: none; }
+        .cargo-email-input::placeholder { color: var(--text-light); }
+
+        .you-label { font-size: 12px; color: var(--text-light); font-style: italic; }
+
+        .pagination-wrap { margin-top: 20px; display: flex; justify-content: center; gap: 8px; }
+        .table-footer { padding: 12px 16px; font-size: 12px; color: var(--text-light); border-top: 1px solid var(--border); }
+
+        @media (max-width: 700px) { .hide-sm { display: none; } .admin-page { padding: 16px 12px 48px; } }
+    </style>
+</head>
+<body>
+
+<header class="navbar">
+    <a href="/" class="logo">FUZZI FILMS</a>
+    <div class="nav-actions">
+        <a href="/painel" class="btn btn-ghost">&#8592; Painel</a>
+        <a href="/painel/pedidos" class="btn btn-ghost">Pedidos</a>
+        <a href="/dashboard" class="btn btn-ghost">Dashboard</a>
+        <form method="post" th:action="@{/logout}" sec:authorize="isAuthenticated()" style="display:inline;">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button type="submit" class="btn btn-danger">Sair</button>
+        </form>
+        <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema">🌙</button>
+    </div>
+</header>
+
+<div class="admin-page">
+
+    <div class="admin-head">
+        <h1>Gerenciar Usuários</h1>
+        <p>Somente Gerentes podem promover ou rebaixar usuários.</p>
+    </div>
+
+    <ul class="flash-list" th:if="${sucesso}" style="margin-bottom:16px;"><li class="success" th:text="${sucesso}"></li></ul>
+    <ul class="flash-list" th:if="${erro}"    style="margin-bottom:16px;"><li class="error"   th:text="${erro}"></li></ul>
+
+    <div class="info-box">
+        <strong>Atenção:</strong> Promover um usuário a Administrador permite que ele cadastre e edite produtos.
+        Gerentes têm acesso total, incluindo promoção de outros usuários. Altere com cuidado.
+    </div>
+
+    <div class="table-card">
+        <table>
+            <thead>
+                <tr>
+                    <th>Usuário</th>
+                    <th>Cargo atual</th>
+                    <th class="hide-sm">Cadastrado em</th>
+                    <th>Alterar cargo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="u : ${usuarios}">
+                    <td>
+                        <div class="user-info">
+                            <span class="user-name"  th:text="${u.nome}">Nome</span>
+                            <span class="user-email" th:text="${u.email}">email</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="cargo-badge" th:classappend="'cargo-' + ${u.cargo}"
+                              th:text="${u.cargo}">CARGO</span>
+                    </td>
+                    <td class="hide-sm">
+                        <span class="user-date" th:text="${#temporals.format(u.criadoEm,'dd/MM/yyyy')}">data</span>
+                    </td>
+                    <td>
+                        <form th:if="${u.id != usuario.id}"
+                              method="POST"
+                              th:action="@{/painel/usuarios/{id}/cargo/solicitar(id=${u.id})}"
+                              class="cargo-form">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                            <select name="cargo" class="cargo-select">
+                                <option th:each="c : ${cargos}"
+                                        th:value="${c}"
+                                        th:text="${c}"
+                                        th:selected="${c == u.cargo}">CARGO</option>
+                            </select>
+                            <input type="email" name="emailConfirmacao"
+                                   class="cargo-email-input"
+                                   placeholder="Seu e-mail para confirmar"
+                                   required>
+                            <button type="submit" class="btn btn-primary" style="padding:6px 14px;font-size:12px;">
+                                Alterar cargo
+                            </button>
+                        </form>
+                        <span class="you-label" th:unless="${u.id != usuario.id}">Você</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="table-footer" th:text="${usuarios.size()} + ' usuário(s) cadastrado(s)'">0 usuários</div>
+    </div>
+
+    <div th:if="${totalPaginas > 1}" class="pagination-wrap">
+        <a th:if="${paginaAtual > 0}"
+           th:href="@{/painel/usuarios(page=${paginaAtual - 1})}"
+           class="page-btn">&#8249; Anterior</a>
+        <span th:unless="${paginaAtual > 0}" class="page-btn disabled">&#8249; Anterior</span>
+
+        <th:block th:each="i : ${#numbers.sequence(0, totalPaginas - 1)}">
+            <a th:if="${i != paginaAtual}"
+               th:href="@{/painel/usuarios(page=${i})}"
+               class="page-btn" th:text="${i + 1}"></a>
+            <span th:if="${i == paginaAtual}" class="page-btn active" th:text="${i + 1}"></span>
+        </th:block>
+
+        <a th:if="${paginaAtual + 1 < totalPaginas}"
+           th:href="@{/painel/usuarios(page=${paginaAtual + 1})}"
+           class="page-btn">Próximo &#8250;</a>
+        <span th:unless="${paginaAtual + 1 < totalPaginas}" class="page-btn disabled">Próximo &#8250;</span>
+    </div>
+
+</div>
+
+<div th:replace="fragments/theme :: themeScript"></div>
+</body>
+</html>

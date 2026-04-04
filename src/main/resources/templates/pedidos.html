@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Meus Pedidos — FUZZI FILMS</title>
+      <link rel="icon" type="image/png" th:href="@{/images/logo.png}">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <style>
+        .page { max-width:860px;margin:32px auto;padding:0 24px; }
+        h1 { font-family:var(--font-display);font-size:22px;font-weight:700;margin-bottom:24px; }
+
+        .pedido-card { background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow-sm);margin-bottom:12px;overflow:hidden;transition:box-shadow var(--transition); }
+        .pedido-card:hover { box-shadow:var(--shadow); }
+
+        .pedido-header { display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);gap:12px; }
+        .pedido-id { font-size:13px;color:var(--text-muted); }
+        .pedido-id strong { color:var(--text);font-weight:600; }
+        .pedido-date { font-size:12px;color:var(--text-light); }
+
+        .pedido-itens { padding:0 20px; }
+        .pedido-item { display:flex;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid var(--border); }
+        .pedido-item:last-child { border-bottom:none; }
+        .pedido-img { width:56px;height:56px;object-fit:contain;border-radius:var(--radius-sm);background:var(--surface-2);border:1px solid var(--border);flex-shrink:0; }
+        .pedido-img-ph { width:56px;height:56px;background:var(--surface-2);border-radius:var(--radius-sm);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0; }
+        .pedido-info { flex:1;min-width:0; }
+        .pedido-nome { font-weight:600;font-size:15px;margin-bottom:3px; }
+        .pedido-qty { font-size:13px;color:var(--text-muted); }
+        .pedido-valor { font-size:16px;font-weight:700;color:var(--text);white-space:nowrap; }
+
+        .status-pill { display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600; }
+        .status-RECEBIDO        { background:#f0f9ff;color:#0369a1; }
+        .status-COLETADO        { background:#fff7ed;color:#c2410c; }
+        .status-NO_ARMAZEM      { background:#faf5ff;color:#7e22ce; }
+        .status-SAIU_DO_ARMAZEM { background:#eff6ff;color:#1d4ed8; }
+        .status-EM_TRANSITO     { background:#ecfdf5;color:#047857; }
+        .status-EM_ROTA         { background:#f0fdf4;color:#15803d; }
+        .status-ENTREGUE        { background:var(--success-bg);color:var(--success); }
+        .status-CANCELADO       { background:var(--danger-bg);color:var(--danger); }
+        .status-REEMBOLSADO     { background:var(--warn-bg);color:var(--warn); }
+
+        .pedido-footer { display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:var(--surface-2);gap:12px;margin-top:8px; }
+        .empty { text-align:center;padding:80px 20px;color:var(--text-muted); }
+        .empty-icon { font-size:48px;margin-bottom:12px; }
+        .empty h2 { font-size:18px;font-weight:600;margin-bottom:6px;color:var(--text); }
+
+        @media(max-width:600px) { .pedido-valor{display:none;} .page{padding:0 12px;} }
+    </style>
+</head>
+<body>
+
+<header class="navbar">
+    <a href="/" class="logo">FUZZI FILMS</a>
+    <div class="nav-actions">
+        <a href="/" class="btn btn-ghost">← Loja</a>
+        <a href="/minha-conta" class="btn btn-ghost">Minha Conta</a>
+     <form method="post" th:action="@{/logout}" sec:authorize="isAuthenticated()" style="display:inline;">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+    <button type="submit" class="btn btn-danger">Sair</button>
+</form>
+    </div>
+</header>
+
+<div class="page">
+    <h1>Meus Pedidos</h1>
+
+    <ul class="flash-list" th:if="${sucesso}"><li class="success" th:text="${sucesso}"></li></ul>
+    <ul class="flash-list" th:if="${erro}"><li class="error" th:text="${erro}"></li></ul>
+
+    <div th:if="${pedidos != null and !pedidos.isEmpty()}">
+        <div class="pedido-card" th:each="pedido : ${pedidos}">
+            <div class="pedido-header">
+                <div>
+                    <div class="pedido-id">Pedido <strong th:text="'#' + ${pedido.id}"></strong></div>
+                    <div class="pedido-date"
+                         th:text="${#temporals.format(pedido.criadoEm, 'dd/MM/yyyy HH:mm')}">Data</div>
+                </div>
+                <span class="status-pill" th:classappend="'status-' + ${pedido.status}"
+                      th:text="${statusLabels[pedido.status]}">Status</span>
+            </div>
+
+            <!-- Lista de itens do pedido -->
+            <div class="pedido-itens">
+                <div class="pedido-item" th:each="item : ${pedido.itens}">
+                    <img class="pedido-img" th:if="${item.produto.imagem != null}"
+                         th:src="@{/uploads/images/__${item.produto.imagem}__}"
+                         th:alt="${item.produto.nome}">
+                    <div class="pedido-img-ph" th:unless="${item.produto.imagem != null}">📦</div>
+                    <div class="pedido-info">
+                        <div class="pedido-nome" th:text="${item.produto.nome}">Produto</div>
+                        <div class="pedido-qty" th:text="${item.quantidade} + ' unidade(s)'">1 unidade</div>
+                    </div>
+                    <div class="pedido-valor"
+                         th:text="'R$ ' + ${#numbers.formatDecimal(item.precoUnitario * item.quantidade,1,'COMMA',2,'POINT')}">R$ 0</div>
+                </div>
+            </div>
+
+            <div class="pedido-footer">
+                <div>
+                    <span style="font-size:13px;color:var(--text-muted);">
+                        Atualizado: <span th:text="${#temporals.format(pedido.atualizadoEm,'dd/MM HH:mm')}">data</span>
+                    </span>
+                    <span style="margin-left:16px;font-weight:600;">
+                        Total: R$ <span th:text="${#numbers.formatDecimal(pedido.valorTotal,1,'COMMA',2,'POINT')}">0,00</span>
+                    </span>
+                </div>
+                <a th:href="@{/pedidos/{id}(id=${pedido.id})}" class="btn btn-ghost" style="font-size:13px;padding:6px 14px;">
+                    Ver rastreio →
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Paginação -->
+<div th:if="${totalPaginas > 1}" class="pagination" style="margin-top: 24px; display: flex; justify-content: center; gap: 8px;">
+    <a th:if="${paginaAtual > 0}"
+       th:href="@{/pedidos(page=${paginaAtual - 1}, size=10)}"
+       class="page-btn">‹ Anterior</a>
+    <span th:unless="${paginaAtual > 0}" class="page-btn disabled">‹ Anterior</span>
+
+    <th:block th:each="i : ${#numbers.sequence(0, totalPaginas - 1)}">
+        <a th:if="${i != paginaAtual}"
+           th:href="@{/pedidos(page=${i}, size=10)}"
+           class="page-btn" th:text="${i + 1}"></a>
+        <span th:if="${i == paginaAtual}"
+              class="page-btn active" th:text="${i + 1}"></span>
+    </th:block>
+
+    <a th:if="${paginaAtual + 1 < totalPaginas}"
+       th:href="@{/pedidos(page=${paginaAtual + 1}, size=10)}"
+       class="page-btn">Próximo ›</a>
+    <span th:unless="${paginaAtual + 1 < totalPaginas}" class="page-btn disabled">Próximo ›</span>
+</div>
+
+    <div class="empty" th:if="${pedidos == null or pedidos.isEmpty()}">
+        <div class="empty-icon">📦</div>
+        <h2>Nenhum pedido ainda</h2>
+        <p>Quando você comprar um produto, seus pedidos aparecerão aqui.</p>
+        <a href="/" class="btn btn-primary" style="margin-top:20px;">Ver produtos</a>
+    </div>
+</div>
+
+<div th:replace="fragments/theme :: themeScript"></div>
+</body>
+</html>

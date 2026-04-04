@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sobre Nós — FUZZI FILMS</title>
+      <link rel="icon" type="image/png" th:href="@{/images/logo.png}">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <style>
+        .about-page {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 48px 24px 80px;
+        }
+        .about-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+        .about-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 12px;
+        }
+        .about-header p {
+            font-size: 16px;
+            color: var(--accent);
+            font-weight: 500;
+        }
+        .about-section {
+            margin-bottom: 48px;
+        }
+        .about-section h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--accent);
+            display: inline-block;
+        }
+        .about-section p {
+            font-size: 16px;
+            line-height: 1.7;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+        .brands {
+            display: flex;
+            gap: 32px;
+            justify-content: center;
+            margin: 32px 0;
+            flex-wrap: wrap;
+        }
+        .brand-card {
+            background: var(--surface-2);
+            border-radius: var(--radius);
+            padding: 24px;
+            text-align: center;
+            flex: 1;
+            min-width: 200px;
+            border: 1px solid var(--border);
+        }
+        .brand-card h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+        .brand-card p {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            gap: 24px;
+            margin: 48px 0;
+            flex-wrap: wrap;
+        }
+        .stat-item {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: 24px 16px;
+            text-align: center;
+            flex: 1;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+        }
+        .stat-number {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .mission-box {
+            background: var(--accent-subtle);
+            border-left: 4px solid var(--accent);
+            padding: 24px 28px;
+            border-radius: var(--radius);
+            margin: 32px 0;
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--accent);
+            text-decoration: none;
+            margin-bottom: 24px;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        @media (max-width: 640px) {
+            .stats { flex-direction: column; }
+            .brands { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="navbar">
+    <a href="/" class="logo">FUZZI FILMS</a>
+    <div class="nav-actions">
+        <a href="/" class="btn btn-ghost">← Loja</a>
+        <a href="/minha-conta" class="btn btn-ghost" sec:authorize="isAuthenticated()">Minha Conta</a>
+        <form method="post" th:action="@{/logout}" sec:authorize="isAuthenticated()" style="display:inline;">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button type="submit" class="btn btn-danger">Sair</button>
+        </form>
+        <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema">🌙</button>
+    </div>
+</header>
+
+<div class="about-page">
+    <a href="/" class="back-link">&#8592; Voltar à loja</a>
+
+    <div class="about-header">
+        <h1>FUZZI FILMS</h1>
+        <p>Importadora e Distribuidora de Películas Solares</p>
+    </div>
+
+    <div class="about-section">
+        <h2>Quem somos</h2>
+        <p>A <strong>FUZZI FILMS</strong> é uma empresa especializada na importação e distribuição de películas solares de alta qualidade para aplicação automotiva, arquitetura e decoração. Somos distribuidores oficiais das marcas <strong>NEXFIL</strong> (com termo de garantia e originalidade) e <strong>ADVANCE</strong>, ambas com garantia de até <strong>10 anos</strong>.</p>
+        <p>Fazemos parte do grupo <strong>SOLAR CAR SERVICE</strong>, que está há mais de <strong>18 anos no mercado</strong>, no mesmo endereço, com um espaço físico de <strong>2.000 m²</strong>. Nossa trajetória é marcada pela busca de parcerias sólidas e duradouras com nossos clientes, sempre pautada na transparência, qualidade e inovação.</p>
+        <p>Além da distribuição, também realizamos instalações profissionais de películas automotivas e residenciais, garantindo o melhor desempenho e acabamento para o seu veículo ou imóvel.</p>
+    </div>
+
+    <div class="brands">
+        <div class="brand-card">
+            <h3>NEXFIL</h3>
+            <p>Garantia de originalidade e termo de garantia<br>Até 10 anos de proteção</p>
+        </div>
+        <div class="brand-card">
+            <h3>ADVANCE</h3>
+            <p>Alta performance e durabilidade<br>Até 10 anos de garantia</p>
+        </div>
+    </div>
+
+    <div class="stats">
+        <div class="stat-item">
+            <div class="stat-number">18+</div>
+            <div class="stat-label">Anos de mercado</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">2.000 m²</div>
+            <div class="stat-label">Estrutura física</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">10 anos</div>
+            <div class="stat-label">Garantia das marcas</div>
+        </div>
+    </div>
+
+    <div class="about-section">
+        <h2>Nossa missão</h2>
+        <div class="mission-box">
+            <p><strong>Oferecer películas de alto desempenho com tecnologia de ponta, aliando conforto térmico, proteção UV e segurança, sempre com atendimento personalizado e compromisso com a satisfação do cliente.</strong></p>
+        </div>
+    </div>
+
+    <div class="about-section">
+        <h2>Por que escolher a FUZZI FILMS?</h2>
+        <ul style="margin-top: 12px;">
+            <li>✔ Produtos originais com certificado de autenticidade</li>
+            <li>✔ Garantia contratual de até 10 anos</li>
+            <li>✔ Mais de 18 anos de experiência no setor</li>
+            <li>✔ Estrutura própria de 2.000 m² para estoque e instalação</li>
+            <li>✔ Equipe treinada e especializada</li>
+            <li>✔ Atendimento personalizado e suporte pós-venda</li>
+        </ul>
+    </div>
+
+    <div class="about-section">
+        <h2>Entre em contato</h2>
+        <p>📧 <a href="mailto:contato@fuzzyfilms.com">contato@fuzzyfilms.com</a><br>
+        📞 (44) 99923-9590<br>
+        📍 Av. Mauá, 1586 - Zona 01, Maringá - PR, 87043-010</p>
+    </div>
+</div>
+
+<div th:replace="fragments/theme :: themeScript"></div>
+</body>
+</html>

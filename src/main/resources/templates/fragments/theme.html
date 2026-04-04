@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+            <link rel="icon" type="image/png" th:href="@{/images/logo.png}">
+    </head>
+<body>
+    <div th:fragment="themeScript">
+        <!-- Script do tema escuro -->
+        <script>
+            (function() {
+                const toggle = document.getElementById('themeToggle');
+                const stored = localStorage.getItem('theme');
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const isDark = stored === 'dark' || (stored === null && prefersDark);
+                
+                if (isDark) document.body.classList.add('dark');
+                
+                if (toggle) {
+                    toggle.innerHTML = isDark ? '☀️' : '🌙';
+                    toggle.onclick = () => {
+                        document.body.classList.toggle('dark');
+                        const nowDark = document.body.classList.contains('dark');
+                        localStorage.setItem('theme', nowDark ? 'dark' : 'light');
+                        toggle.innerHTML = nowDark ? '☀️' : '🌙';
+                    };
+                }
+            })();
+        </script>
+
+        <!-- Script de carregamento (loading) para formulários -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Seleciona formulários com a classe 'loading-form' ou atributo 'data-loading'
+                const forms = document.querySelectorAll('form.loading-form, form[data-loading]');
+                forms.forEach(form => {
+                    form.addEventListener('submit', function(e) {
+                        const submitBtn = this.querySelector('button[type="submit"], input[type="submit"]');
+                        if (!submitBtn) return;
+
+                        // Evita múltiplos envios
+                        if (submitBtn.disabled) {
+                            e.preventDefault();
+                            return;
+                        }
+
+                        // Guarda o texto original
+                        const originalText = submitBtn.innerHTML;
+                        
+                        // Desabilita o botão e adiciona classe de loading
+                        submitBtn.disabled = true;
+                        submitBtn.classList.add('btn-loading');
+                        submitBtn.innerHTML = '<span class="spinner"></span> Processando...';
+                        
+                        // Fallback: reativa após 30 segundos (caso a página não recarregue)
+                        setTimeout(() => {
+                            if (submitBtn.disabled) {
+                                submitBtn.disabled = false;
+                                submitBtn.classList.remove('btn-loading');
+                                submitBtn.innerHTML = originalText;
+                            }
+                        }, 30000);
+                    });
+                });
+            });
+        </script>
+    </div>
+</body>
+</html>

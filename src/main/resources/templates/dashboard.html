@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dashboard — FUZZI FILMS</title>
+      <link rel="icon" type="image/png" th:href="@{/images/logo.png}">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <style>
+        .page { max-width:1100px;margin:0 auto;padding:32px 24px; }
+        .page-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:24px; }
+        .page-header h1 { font-family:var(--font-display);font-size:22px;font-weight:700; }
+        .page-header p { font-size:13px;color:var(--text-muted);margin-top:3px; }
+
+        .table-card { background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden; }
+        table { width:100%;border-collapse:collapse; }
+        thead { background:var(--surface-2);border-bottom:1px solid var(--border); }
+        th { padding:11px 16px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);text-align:left; }
+        td { padding:14px 16px;font-size:14px;border-bottom:1px solid var(--border);vertical-align:middle; }
+        tr:last-child td { border-bottom:none; }
+        tbody tr:hover td { background:var(--surface-2); }
+
+        .prod-cell { display:flex;align-items:center;gap:12px; }
+        .prod-thumb { width:46px;height:46px;object-fit:contain;border-radius:var(--radius-sm);background:var(--surface-2);border:1px solid var(--border);flex-shrink:0; }
+        .prod-name { font-weight:500; }
+        .prod-desc { font-size:12px;color:var(--text-light);margin-top:2px;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+        .prod-vendor { font-size:11px;color:var(--text-light);margin-top:1px; }
+
+        .badge { display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500;gap:4px; }
+        .badge-ok   { background:var(--success-bg);color:var(--success); }
+        .badge-warn { background:var(--warn-bg);color:var(--warn); }
+        .badge-err  { background:var(--danger-bg);color:var(--danger); }
+
+        /* Status produto */
+        .status-ATIVO    { background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0; }
+        .status-INATIVO  { background:var(--surface-2);color:var(--text-muted);border:1px solid var(--border); }
+        .status-SUSPENSO { background:#fef2f2;color:#dc2626;border:1px solid #fca5a5; }
+
+        .row-actions { display:flex;gap:6px;flex-wrap:wrap;align-items:center; }
+        .act-edit { background:var(--secondary-light);color:var(--secondary);font-size:13px; }
+        .act-edit:hover { background:#dbeafe; }
+        .act-del  { font-size:13px; }
+
+        .status-select { font-family:var(--font-body);font-size:12px;padding:4px 8px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--surface-2);cursor:pointer; }
+        .status-btn { font-size:12px;padding:5px 10px; }
+
+        .empty { text-align:center;padding:60px 20px;color:var(--text-muted); }
+        .empty-icon { font-size:38px;margin-bottom:10px; }
+        .empty h3 { font-size:16px;font-weight:600;margin-bottom:6px;color:var(--text); }
+
+        .stats-row { display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px; }
+        .stat-card { background:var(--surface);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow-sm); }
+        .stat-label { font-size:12px;color:var(--text-muted);font-weight:500;text-transform:uppercase;letter-spacing:0.5px; }
+        .stat-value { font-size:26px;font-weight:700;font-family:var(--font-display);color:var(--text);margin-top:4px; }
+
+        @media(max-width:700px) { .hide-sm{display:none;} .page{padding:20px 12px;} .page-header{flex-direction:column;align-items:flex-start;gap:12px;} .stats-row{grid-template-columns:1fr 1fr;} }
+    </style>
+</head>
+<body>
+
+<header class="navbar">
+    <a href="/" class="logo">FUZZI FILMS</a>
+    <div class="nav-actions">
+        <a href="/" class="btn btn-ghost">← Loja</a>
+        <a href="/painel" class="btn btn-ghost">Painel</a>
+        <a href="/minha-conta" class="btn btn-ghost">Minha Conta</a>
+      <form method="post" th:action="@{/logout}" sec:authorize="isAuthenticated()" style="display:inline;">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+    <button type="submit" class="btn btn-danger">Sair</button>
+</form>
+    </div>
+</header>
+
+<div class="page">
+
+    <ul class="flash-list" th:if="${sucesso}"><li class="success" th:text="${sucesso}"></li></ul>
+    <ul class="flash-list" th:if="${erro}"><li class="error" th:text="${erro}"></li></ul>
+
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-label">Produtos ativos</div>
+            <div class="stat-value" th:text="${produtos != null ? produtos.size() : 0}">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Total em estoque</div>
+            <div class="stat-value" th:text="${#aggregates.sum(produtos.![estoque])}">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Vendas realizadas</div>
+            <div class="stat-value" th:text="${#aggregates.sum(produtos.![vendasRealizadas])}">0</div>
+        </div>
+    </div>
+
+    <div class="page-header">
+        <div>
+            <h1 th:text="'Olá, ' + ${usuario_nome} + ' 👋'">Olá!</h1>
+            <p th:text="${cargo == 'GERENTE'} ? 'Gerenciando todos os produtos' : 'Gerenciando seus produtos'">Produtos</p>
+        </div>
+        <a href="/produto/adicionar" class="btn btn-primary">+ Adicionar produto</a>
+    </div>
+
+    <div class="table-card">
+        <table th:if="${produtos != null and !produtos.isEmpty()}">
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th class="hide-sm">Preço</th>
+                    <th class="hide-sm">Estoque</th>
+                    <th class="hide-sm">Vendas</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="p : ${produtos}">
+                    <td>
+                        <div class="prod-cell">
+                            <img class="prod-thumb" th:if="${p.imagem != null}"
+                                 th:src="@{/uploads/images/__${p.imagem}__}" th:alt="${p.nome}">
+                            <div class="prod-thumb" th:unless="${p.imagem != null}"
+                                 style="display:flex;align-items:center;justify-content:center;font-size:20px;">📦</div>
+                            <div>
+                                <div class="prod-name" th:text="${p.nome}">Nome</div>
+                                <div class="prod-desc" th:if="${p.descricao}" th:text="${p.descricao}">Desc</div>
+                                <div class="prod-vendor" th:if="${cargo == 'GERENTE'}"
+                                     th:text="'por ' + ${p.vendedor.nome}">Vendedor</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="hide-sm">
+                        <span style="font-weight:700;" th:text="'R$ ' + ${#numbers.formatDecimal(p.preco,1,'COMMA',2,'POINT')}">R$ 0</span>
+                    </td>
+                    <td class="hide-sm">
+                        <span class="badge badge-err" th:if="${p.estoque == 0}">Esgotado</span>
+                        <span class="badge badge-warn" th:if="${p.estoque > 0 and p.estoque <= 5}" th:text="${p.estoque} + ' un.'">5 un.</span>
+                        <span class="badge badge-ok" th:if="${p.estoque > 5}" th:text="${p.estoque} + ' un.'">10 un.</span>
+                    </td>
+                    <td class="hide-sm">
+                        <span th:text="${p.vendasRealizadas}">0</span>
+                    </td>
+                    <td>
+                        <!-- Status badge + form para alterar -->
+                        <form method="POST" th:action="@{/produto/{id}/status(id=${p.id})}"
+                              style="display:flex;align-items:center;gap:6px;">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                            <select name="statusProduto" class="status-select"
+                                    onchange="this.form.submit()"
+                                    title="Alterar status do produto">
+                                <option th:each="s : ${statusProdutos}"
+                                        th:value="${s}"
+                                        th:text="${s.name()}"
+                                        th:selected="${s == p.statusProduto}"
+                                        th:classappend="'status-' + ${s}">ATIVO</option>
+                            </select>
+                        </form>
+                    </td>
+                    <td>
+                        <div class="row-actions">
+                            <a th:href="@{/produto/editar/{id}(id=${p.id})}" class="btn act-edit">Editar</a>
+                            <a th:href="@{/produto/deletar/{id}(id=${p.id})}" class="btn btn-danger act-del"
+                               onclick="return confirm('Remover este produto?')">Deletar</a>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="empty" th:if="${produtos == null or produtos.isEmpty()}">
+            <div class="empty-icon">📦</div>
+            <h3>Nenhum produto cadastrado</h3>
+            <p>Clique em "Adicionar produto" para começar.</p>
+        </div>
+    </div>
+</div>
+<div th:replace="fragments/theme :: themeScript"></div>
+</body>
+</html>

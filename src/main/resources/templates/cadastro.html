@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cadastro — FUZZI FILMS</title>
+      <link rel="icon" type="image/png" th:href="@{/images/logo.png}">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<div class="auth-page">
+    <div class="auth-card">
+        <a href="/" class="brand">FUZZI FILMS</a>
+        <h1>Criar conta</h1>
+
+        <ul class="flash-list" th:if="${erros != null and !erros.isEmpty()}">
+            <li class="error" th:each="e : ${erros}" th:text="${e}"></li>
+        </ul>
+
+        <form id="cadastroForm" method="POST" th:action="@{/cadastro}" class="loading-form">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+            <div class="field" id="field-nome">
+                <label for="nome">Nome completo <span class="req">*</span></label>
+                <input id="nome" type="text" name="nome" placeholder="Seu nome"
+                       required maxlength="50" autocomplete="name"
+                       th:value="${nome}">
+                <span class="field-error" id="erro-nome"></span>
+            </div>
+
+            <div class="field" id="field-email">
+                <label for="email">E-mail <span class="req">*</span></label>
+                <input id="email" type="email" name="email" placeholder="voce@email.com"
+                       required maxlength="254" autocomplete="email"
+                       th:value="${email}">
+                <span class="field-error" id="erro-email"></span>
+            </div>
+
+            <div class="field" id="field-senha">
+                <label for="senha">Senha <span class="req">*</span></label>
+                <input id="senha" type="password" name="senha"
+                       placeholder="Mínimo 8 caracteres"
+                       required minlength="8" maxlength="254" autocomplete="new-password">
+                <span class="field-error" id="erro-senha"></span>
+            </div>
+
+            <div class="field" id="field-confirmar">
+                <label for="confirmar">Confirmar senha <span class="req">*</span></label>
+                <input id="confirmar" type="password" name="confirmar"
+                       placeholder="Repita a senha"
+                       required minlength="8" maxlength="254" autocomplete="new-password">
+                <span class="field-error" id="erro-confirmar"></span>
+            </div>
+
+            <div class="field" style="margin-bottom:8px;">
+                <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:13px;color:var(--text-muted);font-weight:400;">
+                    <input type="checkbox" name="aceite_termos" id="aceite_termos" required
+                           style="width:16px;height:16px;margin-top:2px;flex-shrink:0;accent-color:var(--accent);">
+                    <span>
+                        Li e concordo com os
+                        <a href="/termos" target="_blank" style="color:var(--accent);font-weight:500;">Termos e Condições de Uso</a>.
+                    </span>
+                </label>
+                <span class="field-error" id="erro-aceite-termos"></span>
+            </div>
+
+            <div class="field" style="margin-bottom:12px;">
+                <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:13px;color:var(--text-muted);font-weight:400;">
+                    <input type="checkbox" name="aceite_lgpd" id="aceite_lgpd" required
+                           style="width:16px;height:16px;margin-top:2px;flex-shrink:0;accent-color:var(--accent);">
+                    <span>
+                        Li e concordo com a
+                        <a href="/privacidade" target="_blank" style="color:var(--accent);font-weight:500;">Política de Privacidade</a>.
+                        Entendo que meus dados serão usados conforme a LGPD (Lei nº 13.709/2018).
+                    </span>
+                </label>
+                <span class="field-error" id="erro-aceite-lgpd"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width:100%;padding:11px;margin-top:4px;">
+                Criar conta
+            </button>
+        </form>
+
+         <a href="/" class="btn btn-secondary" style="width:100%;padding:11px;margin-top:8px;text-align:center;display:block;">
+            Voltar para a loja
+        </a>
+
+        <p class="footer-link">Já tem conta? <a href="/login">Entrar</a></p>
+    </div>
+</div>
+
+<div th:replace="fragments/theme :: themeScript"></div>
+
+<script>
+    (function () {
+        const form = document.getElementById('cadastroForm');
+
+        function showError(id, msg) {
+            const el = document.getElementById(id);
+            if (el) { el.textContent = msg; el.style.display = msg ? 'block' : 'none'; }
+        }
+
+        function clearErrors() {
+            document.querySelectorAll('.field-error').forEach(el => {
+                el.textContent = '';
+                el.style.display = 'none';
+            });
+            document.querySelectorAll('.field').forEach(el => el.classList.remove('field--invalid'));
+        }
+
+        function markInvalid(fieldId) {
+            const field = document.getElementById('field-' + fieldId);
+            if (field) field.classList.add('field--invalid');
+        }
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            clearErrors();
+
+            const nome     = document.getElementById('nome');
+            const email    = document.getElementById('email');
+            const senha    = document.getElementById('senha');
+            const confirmar = document.getElementById('confirmar');
+            const termos   = document.getElementById('aceite_termos');
+            const lgpd     = document.getElementById('aceite_lgpd');
+            let valid = true;
+
+            if (!nome.value.trim()) {
+                showError('erro-nome', 'Informe seu nome completo.');
+                markInvalid('nome');
+                valid = false;
+            }
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!email.value.trim() || !emailRegex.test(email.value.trim())) {
+                showError('erro-email', 'Informe um e-mail válido.');
+                markInvalid('email');
+                valid = false;
+            }
+
+            if (senha.value.length < 8) {
+                showError('erro-senha', 'A senha deve ter no mínimo 8 caracteres.');
+                markInvalid('senha');
+                valid = false;
+            }
+
+            if (confirmar.value !== senha.value) {
+                showError('erro-confirmar', 'As senhas não coincidem.');
+                markInvalid('confirmar');
+                valid = false;
+            }
+
+            if (!termos.checked) {
+                showError('erro-aceite-termos', 'Você precisa aceitar os Termos e Condições.');
+                valid = false;
+            }
+
+            if (!lgpd.checked) {
+                showError('erro-aceite-lgpd', 'Você precisa aceitar a Política de Privacidade.');
+                valid = false;
+            }
+
+            if (valid) form.submit();
+        });
+    })();
+</script>
+</body>
+</html>
