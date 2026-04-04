@@ -35,6 +35,9 @@ public class EnderecoController {
         User user = userRepo.findByEmail(ud.getUsername()).orElseThrow();
         Endereco end = enderecoRepo.findByUser(user).orElse(null);
         model.addAttribute("endereco", end);
+        model.addAttribute("sucesso", null);
+model.addAttribute("erro", null);
+model.addAttribute("info", null);
         return "endereco";
     }
 

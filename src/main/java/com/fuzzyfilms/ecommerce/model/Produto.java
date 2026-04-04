@@ -20,6 +20,10 @@ public class Produto {
     @Column(length = 500)
     private String descricao;
 
+    @Column(name = "valor_frete")
+private BigDecimal valorFrete;
+// getter e setter
+
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal preco;
 

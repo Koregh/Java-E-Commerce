@@ -388,29 +388,36 @@
 
             <!-- Resumo -->
             <div class="cart-summary">
-                <p class="summary-title">Resumo do pedido</p>
+    <p class="summary-title">Resumo do pedido</p>
 
-                <div class="summary-row">
-                    <span>Subtotal</span>
-                    <span th:text="'R$ ' + ${#numbers.formatDecimal(total, 1, 'COMMA', 2, 'POINT')}">R$ 0,00</span>
-                </div>
-                <div class="summary-row">
-                    <span>Frete</span>
-                    <span style="color: var(--success); font-weight:500;">Grátis</span>
-                </div>
+    <div class="summary-row">
+        <span>Subtotal</span>
+        <span th:text="'R$ ' + ${#numbers.formatDecimal(subtotal, 1, 'COMMA', 2, 'POINT')}">R$ 0,00</span>
+    </div>
 
-                <div class="summary-row total">
-                    <span>Total</span>
-                    <span class="price" th:text="'R$ ' + ${#numbers.formatDecimal(total, 1, 'COMMA', 2, 'POINT')}">R$ 0,00</span>
-                </div>
+    <div class="summary-row">
+        <span>Frete</span>
+        <span th:if="${frete > 0}">R$ <span th:text="${#numbers.formatDecimal(frete, 1, 'COMMA', 2, 'POINT')}"></span></span>
+        <span th:if="${frete == 0}" style="color: var(--success);">Grátis</span>
+    </div>
 
-                <div class="summary-frete">🚚 Entrega gratuita em todos os pedidos</div>
+    <div class="summary-row total">
+        <span>Total</span>
+        <span class="price" th:text="'R$ ' + ${#numbers.formatDecimal(total, 1, 'COMMA', 2, 'POINT')}">R$ 0,00</span>
+    </div>
 
-                <div class="summary-actions">
-                    <a href="/checkout" class="btn btn-primary">Finalizar compra</a>
-                    <a href="/" class="btn btn-ghost">← Continuar comprando</a>
-                </div>
-            </div>
+    <div class="summary-frete" th:if="${frete > 0}">
+        🚚 Frete fixo de R$ <span th:text="${#numbers.formatDecimal(frete, 1, 'COMMA', 2, 'POINT')}"></span>
+    </div>
+    <div class="summary-frete" th:if="${frete == 0}">
+        🚚 Entrega gratuita
+    </div>
+
+    <div class="summary-actions">
+        <a href="/checkout" class="btn btn-primary">Finalizar compra</a>
+        <a href="/" class="btn btn-ghost">← Continuar comprando</a>
+    </div>
+</div>
 
         </div>
     </div>

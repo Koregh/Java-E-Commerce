@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title th:text="${produto != null} ? 'Editar Produto — FUZZI FILMS' : 'Novo Produto — FUZZI FILMS'">Produto</title>
+    <title th:text="${produto != null} ? 'Editar Produto — FUZZY FILMS' : 'Novo Produto — FUZZY FILMS'">Produto</title>
     <link rel="stylesheet" th:href="@{/css/main.css}">
     <style>
         .produto-form-page {
@@ -12,7 +12,6 @@
             padding: 0 24px 80px;
         }
 
-        /* ── Breadcrumb ── */
         .form-breadcrumb {
             display: flex;
             align-items: center;
@@ -26,7 +25,6 @@
         .form-breadcrumb a:hover { color: var(--text); }
         .form-breadcrumb .sep { color: var(--text-light); }
 
-        /* ── Card ── */
         .form-card {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -49,7 +47,6 @@
             display: flex;
             border-bottom: 1.5px solid var(--border);
             margin-bottom: 26px;
-            gap: 0;
         }
         .tab-btn {
             padding: 9px 20px;
@@ -197,7 +194,6 @@
             flex-shrink: 0;
         }
 
-        /* ── Status section ── */
         .status-section {
             margin-top: 22px;
             padding-top: 22px;
@@ -237,7 +233,7 @@
 <body>
 
 <header class="navbar">
-    <a href="/" class="logo">FUZZI FILMS</a>
+    <a href="/" class="logo">FUZZY FILMS</a>
     <div class="nav-actions">
         <a href="/dashboard" class="btn btn-ghost">&#8592; Dashboard</a>
         <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema">🌙</button>
@@ -268,10 +264,10 @@
               id="produto-form">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
-            <!-- Tabs -->
+            <!-- Tabs — data-tab em vez de onclick inline -->
             <div class="tabs">
-                <button class="tab-btn active" type="button" onclick="switchTab('descricao', this)">Descrição</button>
-                <button class="tab-btn"        type="button" onclick="switchTab('transporte', this)">Transporte</button>
+                <button class="tab-btn active" type="button" data-tab="descricao">Descrição</button>
+                <button class="tab-btn"        type="button" data-tab="transporte">Transporte</button>
             </div>
 
             <!-- ════ ABA: DESCRIÇÃO ════ -->
@@ -293,7 +289,6 @@
                     <textarea id="descricao" name="descricao"
                               placeholder="Descreva o produto..."
                               maxlength="500"
-                              oninput="updateCount(this)"
                               th:text="${produto != null and produto.descricao != null} ? ${produto.descricao} : ''"></textarea>
                     <div class="char-count"><span id="char-n">0</span>/500</div>
                 </div>
@@ -328,7 +323,7 @@
                         <input type="file" name="imagem"
                                accept="image/png,image/jpeg,image/webp"
                                th:required="${produto == null}"
-                               onchange="preview(this)">
+                               id="imagemInput">
                         <div class="upload-text"><strong>Clique</strong> ou arraste a imagem aqui</div>
                         <div class="upload-hint">PNG · JPG · WEBP — máx. 5MB</div>
                     </div>
@@ -343,7 +338,7 @@
                 <fieldset class="transport-group">
                     <legend>Tipo de frete</legend>
                     <div class="field" style="margin: 8px 0 0;">
-                        <select name="tipoFrete" id="tipoFrete" onchange="toggleFrete(this.value)">
+                        <select name="tipoFrete" id="tipoFrete">
                             <option value="GRATIS"
                                 th:selected="${produto != null and produto.tipoFrete != null and produto.tipoFrete.name() == 'GRATIS'}">
                                 Frete grátis
@@ -363,7 +358,7 @@
                                    th:value="${produto != null} ? ${produto.valorFrete} : ''">
                         </div>
                     </div>
-                    <p class="field-hint" style="margin-top:8px;">Deixe em "Padrão global" para usar a configuração definida em Admin → Frete.</p>
+                    <p class="field-hint" style="margin-top:8px;">Deixe em "Frete grátis" para usar a configuração definida em Admin → Frete.</p>
                 </fieldset>
 
                 <fieldset class="transport-group">
@@ -452,62 +447,95 @@
     </div>
 </div>
 
+<!-- Tema ANTES dos scripts da página para garantir aplicação correta -->
+<div th:replace="fragments/theme :: themeScript"></div>
+
 <script>
-    function toggleFrete(val) {
-        const wrap = document.getElementById("frete-valor-wrap");
-        const input = document.getElementById("valorFrete");
-        const show = val === "FIXO";
-        wrap.style.display = show ? "block" : "none";
-        input.required = show;
-    }
+    // Tudo dentro de DOMContentLoaded — garante que o DOM está pronto
+    document.addEventListener('DOMContentLoaded', function () {
 
-    document.querySelector('form').addEventListener('submit', function(e) {
-    const fileInput = document.querySelector('input[name="imagem"]');
-    if (fileInput.files.length) {
-        const img = new Image();
-        img.onload = function() {
-            if (img.width !== img.height) {
-                alert('A imagem deve ser quadrada!');
-                e.preventDefault();
-            }
-        };
-        img.src = URL.createObjectURL(fileInput.files[0]);
-    }
-});
+        // ── Tabs ──────────────────────────────────────────────
+        document.querySelectorAll('.tab-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var tab = this.dataset.tab;
 
-    function switchTab(name, btn) {
-        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('tab-' + name).classList.add('active');
-        btn.classList.add('active');
-    }
+                // painéis
+                document.querySelectorAll('.tab-panel').forEach(function (p) {
+                    p.classList.remove('active');
+                });
+                document.getElementById('tab-' + tab).classList.add('active');
 
-    document.getElementById('produto-form').addEventListener('submit', function () {
-        const checks = [...document.querySelectorAll('input[name="horariosEntrega"]:checked')];
-        document.querySelectorAll('input[name="horariosEntrega"]').forEach(el => el.disabled = true);
-        const hidden = document.createElement('input');
-        hidden.type = 'hidden';
-        hidden.name = 'horariosEntrega';
-        hidden.value = checks.map(c => c.value).join(',');
-        this.appendChild(hidden);
+                // botões
+                document.querySelectorAll('.tab-btn').forEach(function (b) {
+                    b.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+
+        // ── Frete ─────────────────────────────────────────────
+        function toggleFrete(val) {
+            var wrap  = document.getElementById('frete-valor-wrap');
+            var input = document.getElementById('valorFrete');
+            var show  = val === 'FIXO';
+            wrap.style.display = show ? 'block' : 'none';
+            input.required = show;
+        }
+
+        var tipoFrete = document.getElementById('tipoFrete');
+        tipoFrete.addEventListener('change', function () { toggleFrete(this.value); });
+        toggleFrete(tipoFrete.value); // estado inicial
+
+        // ── Contador de caracteres ─────────────────────────────
+        var descricaoEl = document.getElementById('descricao');
+        var charN       = document.getElementById('char-n');
+        function updateCount() { charN.textContent = descricaoEl.value.length; }
+        descricaoEl.addEventListener('input', updateCount);
+        updateCount();
+
+        // ── Preview de imagem ─────────────────────────────────
+        document.getElementById('imagemInput').addEventListener('change', function () {
+            if (!this.files[0]) return;
+            var wrap = document.getElementById('preview-wrap');
+            var img  = document.getElementById('preview-img');
+            img.src = URL.createObjectURL(this.files[0]);
+            wrap.style.display = 'block';
+        });
+
+        // ── Validação de imagem quadrada no submit ─────────────
+        var form = document.getElementById('produto-form');
+        form.addEventListener('submit', function (e) {
+            var fileInput = document.getElementById('imagemInput');
+            if (!fileInput.files.length) return;
+
+            e.preventDefault(); // segura até validar
+            var img = new Image();
+            img.onload = function () {
+                if (img.width !== img.height) {
+                    alert('A imagem deve ser quadrada (mesma largura e altura)!');
+                } else {
+                    form.submit();
+                }
+                URL.revokeObjectURL(img.src);
+            };
+            img.src = URL.createObjectURL(fileInput.files[0]);
+        });
+
+        // ── Serializa horários como campo hidden no submit ─────
+        form.addEventListener('submit', function () {
+            var checks = Array.from(
+                document.querySelectorAll('input[name="horariosEntrega"]:checked')
+            );
+            document.querySelectorAll('input[name="horariosEntrega"]')
+                    .forEach(function (el) { el.disabled = true; });
+            var hidden = document.createElement('input');
+            hidden.type  = 'hidden';
+            hidden.name  = 'horariosEntrega';
+            hidden.value = checks.map(function (c) { return c.value; }).join(',');
+            form.appendChild(hidden);
+        }, { once: true }); // { once: true } evita duplicar o hidden em re-submits
     });
-
-    toggleFrete(document.getElementById('tipoFrete').value);
-
-    function updateCount(el) {
-        document.getElementById('char-n').textContent = el.value.length;
-    }
-    updateCount(document.getElementById('descricao'));
-
-    function preview(input) {
-        if (!input.files[0]) return;
-        const wrap = document.getElementById('preview-wrap');
-        const img  = document.getElementById('preview-img');
-        img.src = URL.createObjectURL(input.files[0]);
-        wrap.style.display = 'block';
-    }
 </script>
 
-<div th:replace="fragments/theme :: themeScript"></div>
 </body>
 </html>

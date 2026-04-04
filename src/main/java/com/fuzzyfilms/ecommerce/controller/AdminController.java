@@ -17,7 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/admin")
-@PreAuthorize("hasAuthority('ROLE_ADMINISTRADOR')") // ajuste conforme sua segurança
+@PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GERENTE')")
 public class AdminController {
 
     @Autowired private UserRepository userRepo;

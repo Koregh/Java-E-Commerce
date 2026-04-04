@@ -365,6 +365,35 @@
                     </label>
                 </div>
 
+                <!-- Informação de frete (global) -->
+<!-- Informação de frete (prioriza o frete do produto) -->
+<div class="opcao-box" style="margin-bottom: 16px;">
+    <p class="opcao-box-title">🚚 Frete</p>
+    <div th:if="${produto.tipoFrete != null and produto.tipoFrete.name() == 'FIXO' and produto.valorFrete != null and produto.valorFrete > 0}">
+        <span style="color: var(--success); font-weight:500;">
+            R$ <span th:text="${#numbers.formatDecimal(produto.valorFrete, 1, 'COMMA', 2, 'POINT')}"></span>
+        </span>
+        <p class="field-note">Frete fixo para este produto.</p>
+    </div>
+    <div th:if="${produto.tipoFrete != null and produto.tipoFrete.name() == 'GRATIS'}">
+        <span style="color: var(--success); font-weight:500;">Grátis</span>
+        <p class="field-note">Entrega gratuita para este produto.</p>
+    </div>
+    <div th:if="${produto.tipoFrete == null}">
+        <!-- fallback para frete global -->
+        <div th:if="${freteConfig.tipoFrete.name() == 'GRATIS'}">
+            <span style="color: var(--success); font-weight:500;">Grátis</span>
+            <p class="field-note">Entrega gratuita em todo o Brasil.</p>
+        </div>
+        <div th:if="${freteConfig.tipoFrete.name() == 'FIXO'}">
+            <span style="color: var(--success); font-weight:500;">
+                R$ <span th:text="${#numbers.formatDecimal(freteConfig.valorFixo, 1, 'COMMA', 2, 'POINT')}"></span>
+            </span>
+            <p class="field-note">Valor fixo para qualquer destino.</p>
+        </div>
+    </div>
+</div>
+
                 <!-- Agendamento -->
                 <div class="opcao-box" th:if="${produto.aceitaAgendamento}">
                     <p class="opcao-box-title">Agendar entrega</p>

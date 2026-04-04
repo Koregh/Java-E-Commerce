@@ -47,6 +47,7 @@ public class EmailService {
         }
 
         if (debug) {
+              System.out.println("Modo DEBUG ativo – e-mail para {} NÃO será enviado (apenas simulado)"+ para);
              atualizaTimestamp(para);
             return true;
         }

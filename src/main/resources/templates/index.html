@@ -5,118 +5,187 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>FUZZI FILMS</title>
+    <title>FUZZY FILMS</title>
     <link rel="stylesheet" th:href="@{/css/main.css}">
+      <link rel="icon" type="image/png" th:href="@{/images/logo.png}">
     <style>
+        /* ── Página ── */
         .page { max-width: 1280px; margin: 0 auto; padding: 28px 24px; }
-        .section-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:20px; }
-        .section-title { font-family:var(--font-display);font-size:17px;font-weight:600; }
+        .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+        .section-title { font-size: 17px; font-weight: 600; color: var(--text); }
 
-        .grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px; }
+        /* ── Grid de produtos ── */
+        .produtos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 14px;
+        }
 
-        .card { background:var(--surface);border-radius:var(--radius);padding:14px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow-sm);transition:box-shadow var(--transition),transform var(--transition); }
-        .card:hover { box-shadow:var(--shadow-lg);transform:translateY(-2px); }
-        .card-link { text-decoration:none;color:inherit; }
+        /* ── Card ── */
+        .produto-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow-sm);
+            transition: box-shadow var(--transition), transform var(--transition);
+            overflow: hidden;
+            position: relative;
+        }
+        .produto-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
 
-        .card-img { width:100%;aspect-ratio:1;object-fit:contain;border-radius:var(--radius-sm);background:var(--surface-2); }
-        .card-placeholder { width:100%;aspect-ratio:1;background:var(--surface-2);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:36px; }
+        .pcard-link {
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            padding: 12px 12px 8px;
+        }
 
-        .card-name { font-size:13px;line-height:1.4;color:var(--text);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden; }
-        .card-price { font-size:20px;font-weight:700;color:var(--text);letter-spacing:-0.5px; margin:4px 0; }
-        .card-price sup { font-size:12px;font-weight:500;vertical-align:super;margin-right:1px; }
-        .card-vendor { font-size:11px;color:var(--text-light);margin-top:-4px; }
-        .card-sales { font-size:11px;color:var(--text-light); }
-        .card-stock-out { font-size:12px;color:var(--danger);font-weight:500; }
-        .card-frete { font-size:11px;color:var(--success);margin-top:4px; }
+        .pcard-img-wrap {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--surface-2);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .pcard-img { width: 100%; height: 100%; object-fit: contain; }
+        .pcard-placeholder { font-size: 40px; }
 
-        .card-actions { display:flex; gap:8px; margin-top:auto; }
-        .card-btn { background:var(--accent-light);color:var(--accent);font-size:13px;font-weight:500;border:none;border-radius:var(--radius-sm);padding:9px;cursor:pointer;transition:background var(--transition);font-family:var(--font-body); flex:1; text-align:center; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; }
-        .card-btn:hover { background:#fde4e4; }
-        .card-btn:disabled { opacity:0.5;cursor:not-allowed; }
-        .btn-outline { background:transparent; border:1px solid var(--border); color:var(--text); }
-        .btn-outline:hover { background:var(--surface-2); }
+        .pcard-name {
+            font-size: 13px;
+            color: var(--text);
+            line-height: 1.4;
+            margin: 0 0 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .pcard-vendor { font-size: 11px; color: var(--text-light); margin: 0 0 6px; }
 
-        .empty { text-align:center;padding:80px 20px;color:var(--text-muted); }
-        .empty-icon { font-size:48px;margin-bottom:12px; }
-        .empty h2 { font-size:18px;font-weight:600;margin-bottom:6px;color:var(--text); }
+        .pcard-price {
+            font-size: 21px;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: -0.5px;
+            margin: 4px 0 2px;
+            display: flex;
+            align-items: baseline;
+            gap: 2px;
+        }
+        .pcard-price sup { font-size: 12px; font-weight: 500; }
 
-        @media(max-width:600px) { .grid { grid-template-columns:repeat(2,1fr);gap:8px; } .page { padding:16px 12px; } }
+        .pcard-sales { font-size: 11px; color: var(--text-light); margin: 2px 0 0; }
+        .pcard-stock-out { font-size: 12px; color: var(--danger); font-weight: 500; padding: 0 12px 8px; }
+
+        /* Badge de frete no topo do card */
+        .badge-frete {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: var(--success);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 3px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            z-index: 1;
+        }
+
+        /* ── Ações ── */
+        .pcard-actions {
+            display: flex;
+            gap: 6px;
+            padding: 8px 12px 12px;
+            margin-top: auto;
+        }
+        .pcard-btn {
+            flex: 1;
+            padding: 9px 4px;
+            font-size: 12.5px;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            transition: background var(--transition);
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-body);
+        }
+        .pcard-btn-primary { background: var(--accent); color: #fff; }
+        .pcard-btn-primary:hover { background: var(--accent-hover); }
+        .pcard-btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--text); }
+        .pcard-btn-secondary:hover { background: var(--surface-2); }
+        .pcard-btn[disabled] { background: var(--surface-2); color: var(--text-light); cursor: not-allowed; }
+
+        /* ── Paginação ── */
+        .pagination { margin-top: 32px; display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; }
+        .page-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 36px;
+            height: 36px;
+            padding: 0 10px;
+            border-radius: var(--radius-sm);
+            font-size: 13.5px;
+            font-weight: 500;
+            text-decoration: none;
+            color: var(--text);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            transition: background var(--transition), border-color var(--transition);
+        }
+        .page-btn:hover { background: var(--surface-2); border-color: var(--border-mid); }
+        .page-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .page-btn.disabled { opacity: 0.4; pointer-events: none; }
+
+        /* ── Empty state ── */
+        .empty { text-align: center; padding: 80px 20px; color: var(--text-muted); }
+        .empty-icon { font-size: 48px; margin-bottom: 12px; }
+        .empty h2 { font-size: 18px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+
+        @media (max-width: 600px) {
+            .grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .page { padding: 16px 12px; }
+        }
     </style>
 </head>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const slides = document.querySelector('.carousel-slides');
-        const slideItems = document.querySelectorAll('.carousel-slide');
-        const prevBtn = document.querySelector('.carousel-prev');
-        const nextBtn = document.querySelector('.carousel-next');
-        const dotsContainer = document.querySelector('.carousel-dots');
-        let currentIndex = 0;
-        const totalSlides = slideItems.length;
-
-        // Criar bolinhas (dots)
-        for (let i = 0; i < totalSlides; i++) {
-            const dot = document.createElement('span');
-            dot.classList.add('dot');
-            if (i === currentIndex) dot.classList.add('active');
-            dot.addEventListener('click', () => goToSlide(i));
-            dotsContainer.appendChild(dot);
-        }
-        const dots = document.querySelectorAll('.dot');
-
-        function updateDots() {
-            dots.forEach((dot, i) => {
-                dot.classList.toggle('active', i === currentIndex);
-            });
-        }
-
-        function goToSlide(index) {
-            if (index < 0) index = totalSlides - 1;
-            if (index >= totalSlides) index = 0;
-            currentIndex = index;
-            slides.style.transform = `translateX(-${currentIndex * 100}%)`;
-            updateDots();
-        }
-
-        function nextSlide() { goToSlide(currentIndex + 1); }
-        function prevSlide() { goToSlide(currentIndex - 1); }
-
-        if (nextBtn) nextBtn.addEventListener('click', nextSlide);
-        if (prevBtn) prevBtn.addEventListener('click', prevSlide);
-
-        // Auto-play (5 segundos)
-        let interval = setInterval(nextSlide, 5000);
-        const container = document.querySelector('.carousel-container');
-        container.addEventListener('mouseenter', () => clearInterval(interval));
-        container.addEventListener('mouseleave', () => {
-            interval = setInterval(nextSlide, 5000);
-        });
-    });
-</script>
-
 <body>
 
 <header class="navbar">
-    <a href="/" class="logo">FUZZI FILMS</a>
+    <a href="/" class="logo">FUZZY FILMS</a>
     <div class="nav-actions">
         <span class="nav-user" th:if="${usuario_nome}" th:text="'Olá, ' + ${usuario_nome}"></span>
-        <!-- Carrinho só aparece logado -->
-        <a href="/carrinho" class="btn btn-ghost" sec:authorize="isAuthenticated()">Carrinho</a>
-        <a href="/pedidos" class="btn btn-ghost" sec:authorize="isAuthenticated()">Meus Pedidos</a>
-        <a href="/minha-conta" class="btn btn-ghost" sec:authorize="isAuthenticated()">Minha Conta</a>
-                <a href="/dashboard" class="btn btn-ghost" th:if="${isAdminOuGerente}">Dashboard</a>
-        <a href="/painel" class="btn btn-ghost" th:if="${isAdminOuGerente}">Painel</a>
-      <form method="post" th:action="@{/logout}" sec:authorize="isAuthenticated()" style="display:inline;">
-    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-    <button type="submit" class="btn btn-danger">Sair</button>
-</form>
-        <a href="/login" class="btn btn-ghost" sec:authorize="!isAuthenticated()">Entrar</a>
-        <a href="/cadastro" class="btn btn-primary" sec:authorize="!isAuthenticated()">Cadastrar</a>
+        <a href="/carrinho"   class="btn btn-ghost"   sec:authorize="isAuthenticated()">Carrinho</a>
+        <a href="/pedidos"    class="btn btn-ghost"   sec:authorize="isAuthenticated()">Meus Pedidos</a>
+        <a href="/minha-conta" class="btn btn-ghost"  sec:authorize="isAuthenticated()">Minha Conta</a>
+        <a href="/dashboard"  class="btn btn-ghost"   th:if="${isAdminOuGerente}">Dashboard</a>
+        <a href="/painel"     class="btn btn-ghost"   th:if="${isAdminOuGerente}">Painel</a>
+        <form method="post" th:action="@{/logout}" sec:authorize="isAuthenticated()" style="display:inline;">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button type="submit" class="btn btn-danger">Sair</button>
+        </form>
+        <a href="/login"    class="btn btn-ghost"   sec:authorize="!isAuthenticated()">Entrar</a>
+        <a href="/cadastro" class="btn btn-primary"  sec:authorize="!isAuthenticated()">Cadastrar</a>
         <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema escuro">🌙</button>
     </div>
 </header>
 
-<!-- Carrossel de banners promocionais (links comentados para evitar erro 404) -->
+<!-- ── Carrossel ── -->
 <div class="carousel-container">
     <div class="carousel-slides">
         <div class="carousel-slide">
@@ -129,283 +198,120 @@
             <img th:src="@{/images/banner3.png}" alt="Promoção 3">
         </div>
     </div>
-    <button class="carousel-prev">❮</button>
-    <button class="carousel-next">❯</button>
+    <button class="carousel-prev">&#10094;</button>
+    <button class="carousel-next">&#10095;</button>
     <div class="carousel-dots"></div>
 </div>
 
+<!-- ── Produtos ── -->
 <div class="page">
     <div class="section-header">
         <p class="section-title">Produtos disponíveis</p>
         <a href="/produto/adicionar" class="btn btn-primary" th:if="${isAdminOuGerente}">+ Adicionar produto</a>
     </div>
 
-    <div class="flash-list" th:if="${sucesso}" style="margin-bottom:16px;">
-        <li class="success" th:text="${sucesso}"></li>
-    </div>
-    <div class="flash-list" th:if="${erro}" style="margin-bottom:16px;">
-        <li class="error" th:text="${erro}"></li>
-    </div>
+    <ul class="flash-list" th:if="${sucesso != null or erro != null}" style="margin-bottom:16px;">
+        <li class="success" th:if="${sucesso != null}" th:text="${sucesso}"></li>
+        <li class="error"   th:if="${erro != null}"    th:text="${erro}"></li>
+    </ul>
 
-   <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Grid de Produtos — FUZZI FILMS</title>
-    <link rel="stylesheet" th:href="@{/css/main.css}">
-    <style>
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 12px;
-            padding: 16px 0;
-        }
+    <!-- Grid -->
+    <div class="produtos-grid" th:if="${produtos != null and !produtos.isEmpty()}">
+        <div class="produto-card" th:each="produto : ${produtos}">
 
-      
-
-        .card:hover {
-            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-        }
-
-        .card-link {
-            text-decoration: none;
-            color: inherit;
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            padding: 12px;
-        }
-
-        .card-img-wrap {
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-           
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 10px;
-        }
-
-        .card-img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        .card-placeholder {
-            font-size: 40px;
-            color: #ccc;
-        }
-
-        .card-name {
-            font-size: 13px;
-            color: #333;
-            line-height: 1.4;
-            margin: 0 0 6px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            font-weight: 400;
-        }
-
-        .card-vendor {
-            font-size: 11px;
-            color: #999;
-            margin: 0 0 6px;
-        }
-
-        .card-price {
-            font-size: 22px;
-            font-weight: 600;
-            color: #333;
-            margin: 4px 0 2px;
-            display: flex;
-            align-items: baseline;
-            gap: 2px;
-        }
-
-        .card-price sup {
-            font-size: 13px;
-            font-weight: 400;
-            color: #555;
-            margin-top: 2px;
-        }
-
-        .card-price span {
-            line-height: 1;
-        }
-
-        .card-installment {
-            font-size: 11.5px;
-            color: #00a650;
-            margin: 0 0 4px;
-        }
-
-        .card-sales {
-            font-size: 11px;
-            color: #999;
-            margin: 4px 0 0;
-        }
-
-        .card-frete {
-            font-size: 11.5px;
-            color: #00a650;
-            font-weight: 600;
-            padding: 6px 12px 0;
-        }
-
-        .card-stock-out {
-            font-size: 12px;
-            color: #e02020;
-            padding: 6px 12px 0;
-            font-weight: 500;
-        }
-
-        .card-actions {
-            display: flex;
-            gap: 6px;
-            padding: 10px 12px 12px;
-        }
-
-        .card-btn {
-            flex: 1;
-            padding: 8px 4px;
-            font-size: 12px;
-            font-weight: 600;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-            text-align: center;
-            text-decoration: none;
-            transition: background 0.12s;
-            white-space: nowrap;
-        }
-
-        .card-btn-primary {
-            background: #f87171;
-            color: #fff;
-        }
-
-        .card-btn-primary:hover {
-            background: #2968c8;
-        }
-
-        .card-btn-secondary {
-            color: #f87171;
-            border: 1px solid #f87171;
-        }
-
-        .card-btn-secondary:hover {
-            background: #e8f0fe;
-        }
-
-        .card-btn[disabled] {
-            background: #eee;
-            color: #aaa;
-            cursor: not-allowed;
-        }
-
-        .badge-frete {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            background: #00a650;
-            color: #fff;
-            font-size: 10px;
-            font-weight: 700;
-            padding: 2px 6px;
-            border-radius: 3px;
-            letter-spacing: 0.3px;
-            text-transform: uppercase;
-        }
-    </style>
-</head>
-<body>
-
-<div class="grid" th:if="${produtos != null and !produtos.isEmpty()}">
-    <div class="card" th:each="produto : ${produtos}">
-
-        <span class="badge-frete" th:if="${produto.estoque > 0}">Frete grátis</span>
-
-        <a th:href="@{/produto/{id}(id=${produto.id})}" class="card-link">
-            <div class="card-img-wrap">
-                <img class="card-img"
-                     th:if="${produto.imagem != null}"
-                     th:src="@{/uploads/images/__${produto.imagem}__}"
-                     th:alt="${produto.nome}"
-                     loading="lazy">
-                <div class="card-placeholder" th:unless="${produto.imagem != null}">📦</div>
-            </div>
-
-            <p class="card-name" th:text="${produto.nome}">Nome do produto</p>
-            <p class="card-vendor" th:text="${produto.vendedor.nome}">Vendedor</p>
-
-            <div class="card-price">
-                <sup>R$</sup>
-                <span th:text="${#numbers.formatDecimal(produto.preco,1,'COMMA',2,'POINT')}">0,00</span>
-            </div>
-
-            <p class="card-sales"
-               th:if="${produto.vendasRealizadas > 0}"
-               th:text="${produto.vendasRealizadas} + ' vendido(s)'">
-                0 vendidos
-            </p>
-        </a>
-
-        <p class="card-stock-out" th:if="${produto.estoque == 0}">Esgotado</p>
-
-        <div class="card-actions" th:if="${produto.estoque > 0}">
-            <form method="post"
-                  th:action="@{/carrinho/adicionar/{id}(id=${produto.id})}"
-                  style="flex:1;display:flex;">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                <input type="hidden" name="quantidade" value="1">
-                <button type="submit" class="card-btn card-btn-primary" style="width:100%;">
-                    Comprar
-                </button>
-            </form>
-            <a th:href="@{/produto/{id}(id=${produto.id})}"
-               class="card-btn card-btn-secondary">
-                Ver
-            </a>
-        </div>
-
-        <div class="card-actions" th:if="${produto.estoque == 0}">
-            <button class="card-btn" disabled style="width:100%;">Sem estoque</button>
-        </div>
-
-    </div>
-</div>
-
-</body>
-</html>
-
-    <!-- Paginação -->
-<div th:if="${totalPaginas > 1}" class="pagination" style="margin-top: 32px; display: flex; justify-content: center; gap: 8px;">
-    <!-- Botão Anterior -->
-    <a th:if="${paginaAtual > 0}"
-       th:href="@{/(page=${paginaAtual - 1}, size=20)}"
-       class="page-btn">‹ Anterior</a>
-    <span th:unless="${paginaAtual > 0}" class="page-btn disabled">‹ Anterior</span>
-
-    <!-- Links numéricos -->
-    <th:block th:each="i : ${#numbers.sequence(0, totalPaginas - 1)}">
-        <a th:if="${i != paginaAtual}"
-           th:href="@{/(page=${i}, size=20)}"
-           class="page-btn" th:text="${i + 1}"></a>
-        <span th:if="${i == paginaAtual}" class="page-btn active" th:text="${i + 1}"></span>
+            <!-- Badge frete -->
+         <span class="badge-frete" th:if="${produto.estoque > 0}">
+    <!-- 1º: frete individual do produto (se existir e for válido) -->
+    <th:block th:if="${produto.tipoFrete != null and produto.tipoFrete.name() == 'FIXO' and produto.valorFrete != null and produto.valorFrete > 0}">
+        Frete R$ <th:block th:text="${#numbers.formatDecimal(produto.valorFrete, 1, 'COMMA', 2, 'POINT')}"></th:block>
+    </th:block>
+    <th:block th:if="${produto.tipoFrete != null and produto.tipoFrete.name() == 'GRATIS'}">
+        Frete grátis
     </th:block>
 
-    <!-- Botão Próximo -->
-    <a th:if="${paginaAtual + 1 < totalPaginas}"
-       th:href="@{/(page=${paginaAtual + 1}, size=20)}"
-       class="page-btn">Próximo ›</a>
-    <span th:unless="${paginaAtual + 1 < totalPaginas}" class="page-btn disabled">Próximo ›</span>
-</div>
+    <!-- 2º: fallback para frete global (se produto não tem frete individual válido) -->
+    <th:block th:if="${produto.tipoFrete == null or (produto.tipoFrete.name() == 'FIXO' and (produto.valorFrete == null or produto.valorFrete <= 0))}">
+        <th:block th:if="${freteConfig != null}">
+            <th:block th:if="${freteConfig.tipoFrete.name() == 'FIXO' and freteConfig.valorFixo != null and freteConfig.valorFixo > 0}">
+                Frete R$ <th:block th:text="${#numbers.formatDecimal(freteConfig.valorFixo, 1, 'COMMA', 2, 'POINT')}"></th:block>
+            </th:block>
+            <th:block th:if="${freteConfig.tipoFrete.name() == 'GRATIS' or freteConfig.valorFixo == null or freteConfig.valorFixo <= 0}">
+                Frete grátis
+            </th:block>
+        </th:block>
+        <th:block th:if="${freteConfig == null}">Frete grátis</th:block>
+    </th:block>
+</span>
 
+            <a th:href="@{/produto/{id}(id=${produto.id})}" class="pcard-link">
+                <div class="pcard-img-wrap">
+                    <img class="pcard-img"
+                         th:if="${produto.imagem != null}"
+                         th:src="@{/uploads/images/__${produto.imagem}__}"
+                         th:alt="${produto.nome}"
+                         loading="lazy">
+                    <div class="pcard-placeholder" th:unless="${produto.imagem != null}">📦</div>
+                </div>
+
+                <p class="pcard-name"   th:text="${produto.nome}">Nome do produto</p>
+                <p class="pcard-vendor" th:text="${produto.vendedor.nome}">Vendedor</p>
+
+                <div class="pcard-price">
+                    <sup>R$</sup>
+                    <span th:text="${#numbers.formatDecimal(produto.preco, 1, 'COMMA', 2, 'POINT')}">0,00</span>
+                </div>
+
+                <p class="pcard-sales"
+                   th:if="${produto.vendasRealizadas > 0}"
+                   th:text="${produto.vendasRealizadas} + ' vendido(s)'">
+                </p>
+            </a>
+
+            <p class="pcard-stock-out" th:if="${produto.estoque == 0}">Esgotado</p>
+
+            <div class="pcard-actions" th:if="${produto.estoque > 0}">
+                <form method="post"
+                      th:action="@{/carrinho/adicionar/{id}(id=${produto.id})}"
+                      style="flex:1;display:flex;">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <input type="hidden" name="quantidade" value="1">
+                    <button type="submit" class="pcard-btn pcard-btn-primary" style="width:100%;">
+                        Comprar
+                    </button>
+                </form>
+                <a th:href="@{/produto/{id}(id=${produto.id})}" class="pcard-btn pcard-btn-secondary">
+                    Ver
+                </a>
+            </div>
+
+            <div class="pcard-actions" th:if="${produto.estoque == 0}">
+                <button class="pcard-btn" disabled style="width:100%;">Sem estoque</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Paginação -->
+    <div th:if="${totalPaginas > 1}" class="pagination">
+        <a th:if="${paginaAtual > 0}"
+           th:href="@{/(page=${paginaAtual - 1}, size=20)}"
+           class="page-btn">&#8249; Anterior</a>
+        <span th:unless="${paginaAtual > 0}" class="page-btn disabled">&#8249; Anterior</span>
+
+        <th:block th:each="i : ${#numbers.sequence(0, totalPaginas - 1)}">
+            <a th:if="${i != paginaAtual}"
+               th:href="@{/(page=${i}, size=20)}"
+               class="page-btn" th:text="${i + 1}"></a>
+            <span th:if="${i == paginaAtual}" class="page-btn active" th:text="${i + 1}"></span>
+        </th:block>
+
+        <a th:if="${paginaAtual + 1 < totalPaginas}"
+           th:href="@{/(page=${paginaAtual + 1}, size=20)}"
+           class="page-btn">Próximo &#8250;</a>
+        <span th:unless="${paginaAtual + 1 < totalPaginas}" class="page-btn disabled">Próximo &#8250;</span>
+    </div>
+
+    <!-- Empty state -->
     <div class="empty" th:if="${produtos == null or produtos.isEmpty()}">
         <div class="empty-icon">🛍️</div>
         <h2>Nenhum produto disponível</h2>
@@ -413,11 +319,11 @@
     </div>
 </div>
 
-<!-- Rodapé -->
+<!-- ── Rodapé ── -->
 <footer class="footer">
     <div class="footer-container">
         <div class="footer-section">
-            <h4>FUZZI FILMS</h4>
+            <h4>FUZZY FILMS</h4>
             <p>Plataforma independente de películas automotivas e itens relacionados.</p>
             <div class="footer-social">
                 <a href="#" aria-label="Instagram">📷</a>
@@ -432,7 +338,7 @@
                 <li><a href="/privacidade">Política de Privacidade</a></li>
                 <li><a href="/contato">Contato</a></li>
                 <li><a href="/trocas">Trocas e Devoluções</a></li>
-                   <li><a href="/sobre">Sobre Nós</a></li>
+                <li><a href="/sobre">Sobre Nós</a></li>
             </ul>
         </div>
         <div class="footer-section">
@@ -440,14 +346,14 @@
             <ul>
                 <li>📧 <a href="mailto:contato@fuzzyfilms.com">contato@fuzzyfilms.com</a></li>
                 <li>📞 (44) 99923-9590</li>
-                <li>📍 Av. Mauá, 1586 - Zona 01, Maringá - PR, 87043-010</li>
+                <li>📍 Av. Mauá, 1586 - Zona 01, Maringá - PR</li>
             </ul>
         </div>
         <div class="footer-section">
             <h4>Informações legais</h4>
             <ul>
                 <li>CNPJ: 12.345.678/0001-90</li>
-                <li>© 2026 FUZZI FILMS</li>
+                <li>© 2026 FUZZY FILMS</li>
                 <li>Todos os direitos reservados.</li>
             </ul>
         </div>
@@ -458,5 +364,63 @@
 </footer>
 
 <div th:replace="fragments/theme :: themeScript"></div>
+
+<!-- Scripts no final do body, depois do DOM completo -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        // ── Carrossel ──────────────────────────────────────────
+        var slides        = document.querySelector('.carousel-slides');
+        var slideItems    = document.querySelectorAll('.carousel-slide');
+        var prevBtn       = document.querySelector('.carousel-prev');
+        var nextBtn       = document.querySelector('.carousel-next');
+        var dotsContainer = document.querySelector('.carousel-dots');
+        var total         = slideItems.length;
+        var current       = 0;
+        var interval;
+
+        if (!slides || total === 0) return;
+
+        // Criar dots
+        for (var i = 0; i < total; i++) {
+            var dot = document.createElement('button');
+            dot.className = 'dot' + (i === 0 ? ' active' : '');
+            dot.dataset.index = i;
+            dotsContainer.appendChild(dot);
+        }
+
+        dotsContainer.addEventListener('click', function (e) {
+            if (e.target.classList.contains('dot')) {
+                goTo(parseInt(e.target.dataset.index));
+            }
+        });
+
+        function goTo(index) {
+            if (index < 0) index = total - 1;
+            if (index >= total) index = 0;
+            current = index;
+            slides.style.transform = 'translateX(-' + (current * 100) + '%)';
+            document.querySelectorAll('.dot').forEach(function (d, i) {
+                d.classList.toggle('active', i === current);
+            });
+        }
+
+        function next() { goTo(current + 1); }
+        function prev() { goTo(current - 1); }
+
+        if (nextBtn) nextBtn.addEventListener('click', next);
+        if (prevBtn) prevBtn.addEventListener('click', prev);
+
+        function startAuto() { interval = setInterval(next, 5000); }
+        function stopAuto()  { clearInterval(interval); }
+
+        var container = document.querySelector('.carousel-container');
+        container.addEventListener('mouseenter', stopAuto);
+        container.addEventListener('mouseleave', startAuto);
+
+        startAuto();
+    });
+</script>
+
 </body>
 </html>

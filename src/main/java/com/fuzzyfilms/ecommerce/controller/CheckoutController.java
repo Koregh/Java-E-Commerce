@@ -1,5 +1,6 @@
 package com.fuzzyfilms.ecommerce.controller;
 
+import com.fuzzyfilms.ecommerce.controller.CarrinhoController.CarrinhoItem;
 import com.fuzzyfilms.ecommerce.model.*;
 import com.fuzzyfilms.ecommerce.repository.*;
 import com.fuzzyfilms.ecommerce.service.*;
@@ -26,49 +27,46 @@ public class CheckoutController {
     @Autowired private PedidoRepository pedidoRepo;
     @Autowired private PedidoItemRepository pedidoItemRepo;   // ← ADICIONADO
 
-    @GetMapping("/checkout")
-    public String checkout(HttpSession session,
-                           @AuthenticationPrincipal UserDetails ud,
-                           Model model,
-                           RedirectAttributes ra) {
-        User user = userRepo.findByEmail(ud.getUsername()).orElseThrow();
-
-        Endereco endereco = enderecoRepo.findByUser(user).orElse(null);
-        if (endereco == null || endereco.getCpfHash() == null) {
-            ra.addFlashAttribute("erro", "Você precisa cadastrar um endereço e CPF antes de finalizar a compra.");
-            return "redirect:/minha-conta/endereco";
-        }
-
-        var itens = carrinhoService.obterCarrinho(session);
-        if (itens.isEmpty()) {
-            ra.addFlashAttribute("erro", "Seu carrinho está vazio.");
-            return "redirect:/carrinho";
-        }
-
-        BigDecimal subtotal = itens.stream()
-                .map(item -> item.getProduto().getPreco().multiply(BigDecimal.valueOf(item.getQuantidade())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal frete = freteService.calcularFrete(endereco.getCep());
-        BigDecimal total = subtotal.add(frete);
-
-        model.addAttribute("itens", itens);
-        model.addAttribute("subtotal", subtotal);
-        model.addAttribute("frete", frete);
-        model.addAttribute("total", total);
-        model.addAttribute("endereco", endereco);
-        return "checkout";
+   // No CheckoutController
+@GetMapping("/checkout")
+public String checkout(HttpSession session,
+                       @AuthenticationPrincipal UserDetails ud,
+                       Model model,
+                       RedirectAttributes ra) {
+    User user = userRepo.findByEmail(ud.getUsername()).orElseThrow();
+    Endereco endereco = enderecoRepo.findByUser(user).orElse(null);
+    if (endereco == null || endereco.getCpfHash() == null) {
+        ra.addFlashAttribute("erro", "Você precisa cadastrar um endereço e CPF antes de finalizar a compra.");
+        return "redirect:/minha-conta/endereco";
     }
 
-    @GetMapping("/pagamento/pix/{pedidoId}")
-public String paginaPix(@PathVariable Long pedidoId, Model model, RedirectAttributes ra) {
-    Pedido pedido = pedidoRepo.findById(pedidoId).orElse(null);
-    if (pedido == null || pedido.getQrCode() == null) {
-        ra.addFlashAttribute("erro", "QR Code não encontrado.");
-        return "redirect:/pedidos";
+    var itens = carrinhoService.obterCarrinho(session);
+    if (itens.isEmpty()) {
+        ra.addFlashAttribute("erro", "Seu carrinho está vazio.");
+        return "redirect:/carrinho";
     }
-    model.addAttribute("qrCode", pedido.getQrCode());
-    model.addAttribute("pedido", pedido);
-    return "pix_pagamento";
+
+    BigDecimal subtotal = itens.stream()
+            .map(item -> item.getProduto().getPreco().multiply(BigDecimal.valueOf(item.getQuantidade())))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+    
+    // Calcula frete total somando frete de cada produto
+    BigDecimal freteTotal = BigDecimal.ZERO;
+    for (CarrinhoItem item : itens) {
+        Produto p = item.getProduto();
+        BigDecimal freteItem = freteService.calcularFrete(p, endereco.getCep());
+        // Multiplica pela quantidade? Normalmente frete é por pedido, não por unidade. 
+        // Se quiser multiplicar, faça: freteItem.multiply(BigDecimal.valueOf(item.getQuantidade()))
+        freteTotal = freteTotal.add(freteItem);
+    }
+    BigDecimal total = subtotal.add(freteTotal);
+
+    model.addAttribute("itens", itens);
+    model.addAttribute("subtotal", subtotal);
+    model.addAttribute("frete", freteTotal);
+    model.addAttribute("total", total);
+    model.addAttribute("endereco", endereco);
+    return "checkout";
 }
 
     @PostMapping("/checkout/pagar")
