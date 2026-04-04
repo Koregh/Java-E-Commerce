@@ -207,11 +207,19 @@
     </div>
 
     <!-- Flash messages -->
+<<<<<<< HEAD
   <ul th:if="${sucesso != null or erro != null or info != null}" class="flash-list" style="margin-bottom:16px;">
     <li th:if="${sucesso}" class="success" th:text="${sucesso}"></li>
     <li th:if="${erro}"    class="error"   th:text="${erro}"></li>
     <li th:if="${info}"    class="info"    th:text="${info}"></li>
 </ul>
+=======
+    <ul th:if="${sucesso or erro or info}" class="flash-list" style="margin-bottom:16px;">
+        <li th:if="${sucesso}" class="success" th:text="${sucesso}"></li>
+        <li th:if="${erro}"    class="error"   th:text="${erro}"></li>
+        <li th:if="${info}"    class="info"    th:text="${info}"></li>
+    </ul>
+>>>>>>> 9ba9f927d6bb5d141e1cdf23897ae1fd82d09e05
 
     <div class="endereco-card">
         <form method="POST" th:action="@{/minha-conta/endereco/salvar}" id="enderecoForm">
@@ -351,4 +359,8 @@
 </script>
 
 </body>
+<<<<<<< HEAD
 </html>
+=======
+</html>
+>>>>>>> 9ba9f927d6bb5d141e1cdf23897ae1fd82d09e05
