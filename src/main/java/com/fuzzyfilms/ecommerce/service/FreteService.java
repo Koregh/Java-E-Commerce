@@ -11,6 +11,10 @@ import java.math.BigDecimal;
 
 @Service
 public class FreteService {
+
+     @Autowired
+    private FreteConfigRepository freteConfigRepo; 
+
     @Autowired private FreteConfigRepository configRepo;
    public BigDecimal calcularFrete(Produto produto, String cep) {
     if (produto != null && produto.getTipoFrete() != null) {

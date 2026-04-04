@@ -88,11 +88,19 @@ public String checkout(HttpSession session,
         }
 
         // Recalcular totais
-        BigDecimal subtotal = itens.stream()
-                .map(item -> item.getProduto().getPreco().multiply(BigDecimal.valueOf(item.getQuantidade())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal frete = freteService.calcularFrete(endereco.getCep());
-        BigDecimal total = subtotal.add(frete);
+BigDecimal subtotal = itens.stream()
+        .map(item -> item.getProduto().getPreco().multiply(BigDecimal.valueOf(item.getQuantidade())))
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+BigDecimal freteTotal = BigDecimal.ZERO;
+for (CarrinhoItem item : itens) {
+    Produto p = item.getProduto();
+    BigDecimal freteItem = freteService.calcularFrete(p, endereco.getCep());
+    // Se o frete for por unidade, multiplique pela quantidade:
+    // freteItem = freteItem.multiply(BigDecimal.valueOf(item.getQuantidade()));
+    freteTotal = freteTotal.add(freteItem);
+}
+BigDecimal total = subtotal.add(freteTotal);
 
         // 1. Criar pedido (sem produto/quantidade diretos)
         Pedido pedido = new Pedido();
@@ -100,7 +108,7 @@ public String checkout(HttpSession session,
         pedido.setValorTotal(total);
         pedido.setStatus(Pedido.StatusPedido.AGUARDANDO_PAGAMENTO);
         pedido.setCriadoEm(LocalDateTime.now());
-        pedido.setValorFrete(frete);
+        pedido.setValorFrete(freteTotal);
         pedido.setEnderecoEntrega(endereco.getEndereco() + ", " + endereco.getNumero() + " - " + endereco.getCidade() + "/" + endereco.getEstado());
         pedidoRepo.save(pedido); // salva para gerar o ID
 
