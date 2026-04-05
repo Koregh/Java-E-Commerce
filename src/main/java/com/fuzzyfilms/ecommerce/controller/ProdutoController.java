@@ -122,14 +122,14 @@
             User vendedor = userRepo.findByEmail(ud.getUsername()).orElseThrow();
 
             // Validação nome
-            if (nome == null || nome.trim().length() < 2) {
-                ra.addFlashAttribute("erro", "Nome do produto deve ter pelo menos 2 caracteres.");
+            if (nome == null || nome.trim().length() < 2 || nome.trim().length() > 100) {
+                ra.addFlashAttribute("erro", "Nome do produto deve ter entre 2 e 100 caracteres.");
                 return "redirect:/produto/adicionar";
             }
 
             // Validação preço
-            if (preco == null || preco.compareTo(BigDecimal.ZERO) <= 0) {
-                ra.addFlashAttribute("erro", "Preço deve ser um número maior que zero (ex: 19.90).");
+            if (preco == null || preco.compareTo(BigDecimal.ZERO) <= 0 || preco.compareTo(new BigDecimal("999999.99")) > 0) {
+                ra.addFlashAttribute("erro", "Preço deve ser um número maior que zero e menor ou igual a 999999.99 (ex: 19.90).");
                 return "redirect:/produto/adicionar";
             }
             if (preco.scale() > 2) {
@@ -138,8 +138,8 @@
             }
 
             // Validação estoque
-            if (estoque == null || estoque < 0) {
-                ra.addFlashAttribute("erro", "Estoque deve ser um número inteiro maior ou igual a zero.");
+            if (estoque == null || estoque < 0 || estoque > 10000) {
+                ra.addFlashAttribute("erro", "Estoque deve ser um número inteiro maior ou igual a zero e menor ou igual a 10000.");
                 return "redirect:/produto/adicionar";
             }
 
@@ -248,20 +248,20 @@
             }
 
             // Validações
-            if (nome == null || nome.trim().length() < 2) {
-                ra.addFlashAttribute("erro", "Nome do produto deve ter pelo menos 2 caracteres.");
+            if (nome == null || nome.trim().length() < 2 || nome.trim().length() > 100) {
+                ra.addFlashAttribute("erro", "Nome do produto deve ter entre 2 e 100 caracteres.");
                 return "redirect:/produto/editar/" + id;
             }
-            if (preco == null || preco.compareTo(BigDecimal.ZERO) <= 0) {
-                ra.addFlashAttribute("erro", "Preço deve ser um número maior que zero (ex: 19.90).");
+            if (preco == null || preco.compareTo(BigDecimal.ZERO) <= 0 || preco.compareTo(new BigDecimal("999999.99")) > 0) {
+                ra.addFlashAttribute("erro", "Preço deve ser um número maior que zero e menor ou igual a 999999.99 (ex: 19.90).");
                 return "redirect:/produto/editar/" + id;
             }
             if (preco.scale() > 2) {
                 ra.addFlashAttribute("erro", "Preço deve ter no máximo 2 casas decimais.");
                 return "redirect:/produto/editar/" + id;
             }
-            if (estoque == null || estoque < 0) {
-                ra.addFlashAttribute("erro", "Estoque deve ser um número inteiro maior ou igual a zero.");
+            if (estoque == null || estoque < 0 || estoque > 10000) {
+                ra.addFlashAttribute("erro", "Estoque deve ser um número inteiro maior ou igual a zero e menor ou igual a 10000.");
                 return "redirect:/produto/editar/" + id;
             }
 

@@ -42,7 +42,14 @@ public String alterarCargo(@PathVariable Long id,
         return "redirect:/admin/usuarios";
     }
 
+    
+
     User admin = userRepo.findByEmail(currentUser.getUsername()).orElseThrow();
+
+    if (admin.getId().equals(alvo.getId())) {
+    ra.addFlashAttribute("erro", "Você não pode alterar seu próprio cargo.");
+    return "redirect:/admin/usuarios";
+}       
 
     if (admin.getId().equals(alvo.getId()) && !alvo.getCargo().name().equals(cargo)) {
         ra.addFlashAttribute("erro", "Você não pode alterar seu próprio cargo.");

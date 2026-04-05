@@ -33,7 +33,7 @@ public class User {
     private LocalDateTime criadoEm = LocalDateTime.now();
 
     // ── 2FA ────────────────────────────────────────────────────
-    @Column(name = "codigo_2fa", length = 6)
+    @Column(name = "codigo_2fa", length = 64)
     private String codigo2fa;
 
     @Column(name = "codigo_2fa_expira")

@@ -48,6 +48,15 @@ public class CadastroController {
         return "trocas";
     }
 
+        public static boolean isValidEmail(String email) {
+    String regex = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
+    return email != null && email.matches(regex);
+}
+
+    // Exige: 8+ caracteres, pelo menos 1 maiúscula, 1 minúscula, 1 número, 1 caractere especial
+private static final String SENHA_REGEX = 
+    "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
+
   @PostMapping("/cadastro")
 public String registrar(@RequestParam String nome,
                         @RequestParam String email,
@@ -75,6 +84,17 @@ public String registrar(@RequestParam String nome,
         model.addAttribute("erro", "Nome deve ter entre 2 e 50 caracteres.");
         return "cadastro";
     }
+
+    if (!isValidEmail(email)) {
+        model.addAttribute("erro", "E-mail inválido.");
+        return "cadastro";
+    }
+
+    if (!senha.matches(SENHA_REGEX)) {
+    model.addAttribute("erro", 
+        "A senha deve ter no mínimo 8 caracteres, incluindo letra maiúscula, minúscula, número e caractere especial (@$!%*?&).");
+    return "cadastro";
+}
 
     // Criar usuário (dentro do try-catch)
     User u = new User();

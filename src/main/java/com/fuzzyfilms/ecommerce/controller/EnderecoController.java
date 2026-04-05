@@ -9,6 +9,7 @@ import com.fuzzyfilms.ecommerce.service.AuditService;
 import com.fuzzyfilms.ecommerce.service.EnderecoValidacaoService;
 import com.fuzzyfilms.ecommerce.service.TwoFactorService;
 import com.fuzzyfilms.ecommerce.util.HashUtil;
+import org.springframework.beans.factory.annotation.Value;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,10 @@ public class EnderecoController {
     @Autowired private EnderecoValidacaoService validacaoService;
     @Autowired private TwoFactorService tfaService;
     @Autowired private AuditService auditService;
+
+    /** Secret para HMAC do CPF — configure em app.cpf-secret (mínimo 32 chars). */
+    @Value("${app.cpf-secret}")
+    private String cpfSecret;
 
     // ─── Exibir formulário (GET) ────────────────────────────────────
     @GetMapping
@@ -90,7 +95,7 @@ model.addAttribute("info", null);
             ra.addFlashAttribute("erro", "CPF inválido.");
             return "redirect:/minha-conta/endereco";
         }
-        String cpfHash = HashUtil.sha256(cpfLimpo);
+        String cpfHash = HashUtil.hmacCpf(cpfLimpo, cpfSecret);
         Endereco enderecoExistente = enderecoRepo.findByUser(user).orElse(null);
 
         // Verifica unicidade do CPF — mensagem genérica para não revelar o motivo

@@ -2,57 +2,70 @@ package com.fuzzyfilms.ecommerce.service;
 
 import com.fuzzyfilms.ecommerce.model.User;
 import com.fuzzyfilms.ecommerce.repository.UserRepository;
+import com.fuzzyfilms.ecommerce.util.HashUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import org.springframework.beans.factory.annotation.Value;
 
+/**
+ * Serviço de autenticação de dois fatores.
+ *
+ * O código de 6 dígitos é armazenado HASHEADO (SHA-256) no banco —
+ * nunca em texto puro. A verificação usa HashUtil.verificar2fa(),
+ * que compara em constant-time para evitar timing attacks.
+ */
 @Service
 public class TwoFactorService {
 
-    private static final int MAX_TENTATIVAS = 5;
-    private static final int EXPIRA_MINUTOS = 15;
+    private static final int MAX_TENTATIVAS   = 5;
+    private static final int EXPIRA_MINUTOS   = 15;
     private static final int BLOQUEIO_MINUTOS = 30;
 
-    @Autowired
-    private UserRepository userRepo;
-    @Autowired
-    private EmailService emailService;
-      @Value("${debug:false}")
-    private boolean debug;
+    @Autowired private UserRepository userRepo;
+    @Autowired private EmailService emailService;
 
-    /** Gera e envia novo código 2FA. Retorna false se bloqueado. */
+    /**
+     * Gera código 2FA, armazena o HASH no banco e envia o código em claro por e-mail.
+     * Retorna false se o usuário estiver bloqueado.
+     */
     public boolean gerarEEnviar(User user, String contexto) {
         if (estaBloqueado(user)) return false;
 
+        // Gera código de 6 dígitos com SecureRandom
         String codigo = String.format("%06d", new SecureRandom().nextInt(1_000_000));
-        user.setCodigo2fa(codigo);
+
+        // Armazena HASH — nunca o código em claro
+        user.setCodigo2fa(HashUtil.hash2fa(codigo));
         user.setCodigo2faExpira(LocalDateTime.now().plusMinutes(EXPIRA_MINUTOS));
         user.setTentativas2fa(0);
         user.setBloqueado2faAte(null);
         userRepo.save(user);
 
+        // Envia o código em claro apenas por e-mail
         emailService.enviarCodigo2FA(user.getEmail(), codigo, contexto);
         return true;
     }
 
-    /** Verifica código. Retorna: "ok", "expirado", "invalido", "bloqueado" */
+    /**
+     * Verifica o código informado pelo usuário.
+     *
+     * @return "ok" | "expirado" | "invalido" | "bloqueado"
+     */
     public String verificar(User user, String codigoInformado) {
         if (estaBloqueado(user)) return "bloqueado";
         if (user.getCodigo2fa() == null) return "invalido";
+
         if (LocalDateTime.now().isAfter(user.getCodigo2faExpira())) {
             limpar(user);
+            userRepo.save(user);
             return "expirado";
         }
 
-        if (debug) {
-            limpar(user);
-             userRepo.save(user);
-        return "ok";
-        }
+        // Comparação constant-time via HashUtil
+        boolean correto = HashUtil.verificar2fa(codigoInformado, user.getCodigo2fa());
 
-        if (!user.getCodigo2fa().equals(codigoInformado.trim())) {
+        if (!correto) {
             int t = user.getTentativas2fa() + 1;
             user.setTentativas2fa(t);
             if (t >= MAX_TENTATIVAS) {
@@ -64,6 +77,7 @@ public class TwoFactorService {
             userRepo.save(user);
             return "invalido";
         }
+
         limpar(user);
         userRepo.save(user);
         return "ok";

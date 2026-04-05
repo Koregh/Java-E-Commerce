@@ -15,9 +15,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-
-
 
 @Configuration
 public class SecurityConfig {
@@ -31,14 +28,14 @@ public class SecurityConfig {
     }
 
     @Bean
-public HttpSessionEventPublisher httpSessionEventPublisher() {
-    return new HttpSessionEventPublisher();
-}
+    public HttpSessionEventPublisher httpSessionEventPublisher() {
+        return new HttpSessionEventPublisher();
+    }
 
-@Bean
-public SessionRegistry sessionRegistry() {
-    return new SessionRegistryImpl();
-}
+    @Bean
+    public SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
+    }
 
     @Bean
     public AuthenticationManager authManager(HttpSecurity http) throws Exception {
@@ -52,15 +49,14 @@ public SessionRegistry sessionRegistry() {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-        
             .authorizeHttpRequests(auth -> auth
-               .requestMatchers(
-    "/", "/login", "/login/auth", "/login/2fa", "/login/reenviar",
-    "/cadastro", "/privacidade", "/termos", "/contato", "/sobre", "/trocas",
-    "/esqueci-senha", "/esqueci-senha/verificar", "/esqueci-senha/redefinir",
-    "/css/**", "/images/**", "/uploads/**",
-    "/produto/**"
-).permitAll()
+                .requestMatchers(
+                    "/", "/login", "/login/auth", "/login/2fa", "/login/reenviar",
+                    "/cadastro", "/privacidade", "/termos", "/contato", "/sobre", "/trocas",
+                    "/esqueci-senha", "/esqueci-senha/verificar", "/esqueci-senha/redefinir",
+                    "/css/**", "/images/**", "/uploads/**",
+                    "/produto/**"
+                ).permitAll()
                 .requestMatchers("/painel/**")
                     .hasAnyRole("ADMINISTRADOR", "GERENTE")
                 .requestMatchers(
@@ -78,14 +74,16 @@ public SessionRegistry sessionRegistry() {
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID")
             )
-             .sessionManagement(session -> session
-            .maximumSessions(3)
-            .sessionRegistry(sessionRegistry())
-        )
+            .sessionManagement(session -> session
+                .maximumSessions(3)
+                .sessionRegistry(sessionRegistry())
+            )
             .csrf(csrf -> csrf
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .csrfTokenRequestHandler(new XorCsrfTokenRequestAttributeHandler())
-                .ignoringRequestMatchers("/login/auth", "/login/2fa", "/login/reenviar")
+                // ignoringRequestMatchers REMOVIDO — todos os endpoints validam o token CSRF,
+                // inclusive /login/auth, /login/2fa e /login/reenviar.
+                // Os templates já enviam o token via th:name="${_csrf.parameterName}".
             );
 
         return http.build();
