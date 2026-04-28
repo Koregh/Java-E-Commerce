@@ -17,7 +17,7 @@ Este projeto foi construído para ir além do CRUD básico. Cada decisão técni
 ### Segurança aplicada na prática
 
 **Autenticação em duas etapas (2FA)**
-O código de 6 dígitos gerado com `SecureRandom` nunca é armazenado em texto puro — vai direto para um hash SHA-256 no banco. A verificação usa `MessageDigest.isEqual()`, que é constant-time e imune a timing attacks. O código expira em 15 minutos e bloqueia o usuário após 5 tentativas erradas por 30 minutos.
+O código de 6 dígitos gerado com `SecureRandom` nunca é armazenado em texto puro, vai direto para um hash SHA-256 no banco. A verificação usa `MessageDigest.isEqual()`, que é constant-time e imune a timing attacks. O código expira em 15 minutos e bloqueia o usuário após 5 tentativas erradas por 30 minutos.
 
 **CPF com HMAC-SHA256**
 CPFs não ficam em texto puro no banco. São transformados em HMAC-SHA256 com um secret configurável, o que permite verificar unicidade sem expor o dado real — rainbow tables não funcionam sem conhecer a chave.
@@ -129,7 +129,7 @@ Acesse em `http://localhost:8080`
 Códigos 2FA têm entropia baixa (6 dígitos = ~20 bits) e bcrypt não ajuda nisso — um atacante com o banco pode testar os 1 milhão de combinações em segundos independentemente do custo do hash. O controle real está no rate limiting e no bloqueio após 5 tentativas, que são feitos na camada de aplicação. SHA-256 com comparação constant-time é suficiente e mais performático para este caso.
 
 **Por que HMAC e não SHA-256 para o CPF?**
-SHA-256 puro é determinístico e sem salt — dois usuários com o mesmo CPF teriam o mesmo hash, e rainbow tables para CPFs brasileiros são viáveis (são apenas 11 dígitos numéricos). HMAC-SHA256 com um secret da aplicação elimina esse vetor: sem a chave, não há ataque offline possível.
+SHA-256 puro é determinístico e sem salt — dois usuários com o mesmo CPF teriam o mesmo hash, e rainbow tables para CPFs são viáveis (são apenas 11 dígitos numéricos). HMAC-SHA256 com um secret da aplicação elimina esse vetor: sem a chave, não há ataque offline possível.
 
 **Por que Rate Limiting no filtro e não na camada de serviço?**
 O filtro roda antes do DispatcherServlet, bloqueando a requisição antes de qualquer processamento. Colocar na camada de serviço deixaria o stack do Spring inteiro sendo instanciado a cada tentativa de brute force.
