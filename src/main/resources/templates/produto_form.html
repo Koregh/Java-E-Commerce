@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title th:text="${produto != null} ? 'Editar Produto — FUZZY FILMS' : 'Novo Produto — FUZZY FILMS'">Produto</title>
+    <title th:text="${produto != null} ? 'Editar Produto — Koregh Store' : 'Novo Produto — Koregh Store'">Produto</title>
     <link rel="stylesheet" th:href="@{/css/main.css}">
     <style>
         .produto-form-page {
@@ -233,7 +233,7 @@
 <body>
 
 <header class="navbar">
-    <a href="/" class="logo">FUZZY FILMS</a>
+    <a href="/" class="logo">Koregh Store</a>
     <div class="nav-actions">
         <a href="/dashboard" class="btn btn-ghost">&#8592; Dashboard</a>
         <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema">🌙</button>
@@ -276,7 +276,7 @@
                 <div class="field">
                     <label for="nome">Nome <span class="req">*</span></label>
                     <input id="nome" type="text" name="nome"
-                           placeholder="Ex: Película fumê 5%"
+                           placeholder="Ex: Produto modelo XY"
                            required maxlength="120"
                            th:value="${produto != null} ? ${produto.nome} : ''">
                 </div>

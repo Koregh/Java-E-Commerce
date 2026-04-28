@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Endereço de entrega — FUZZY FILMS</title>
+    <title>Endereço de entrega — Koregh Store</title>
     <link rel="icon" type="image/png" th:href="@{/images/logo.png}">
     <link rel="stylesheet" th:href="@{/css/main.css}">
     <style>
@@ -183,7 +183,7 @@
 <body>
 
 <header class="navbar">
-    <a href="/" class="logo">FUZZY FILMS</a>
+    <a href="/" class="logo">Koregh Store</a>
     <div class="nav-actions">
         <a href="/minha-conta" class="btn btn-ghost">← Minha conta</a>
         <form method="post" th:action="@{/logout}" sec:authorize="isAuthenticated()" style="display:inline;">
@@ -233,7 +233,7 @@
                     <label for="telefone">Telefone (WhatsApp) <span class="req">*</span></label>
                     <input type="tel" id="telefone" name="telefone" class="form-control"
                            th:value="${endereco?.telefone}" required maxlength="20"
-                           placeholder="(44) 99923-9590">
+                           placeholder="(11) 99999-0000">
                 </div>
 
                 <div class="field" style="margin-bottom:0;">

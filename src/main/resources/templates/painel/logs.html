@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Logs de auditoria — FUZZI FILMS</title>
+    <title>Logs de auditoria — Koregh Store</title>
     <link rel="stylesheet" th:href="@{/css/main.css}">
     <style>
         .admin-page { max-width: 1200px; margin: 0 auto; padding: 32px 24px 80px; }
@@ -87,7 +87,7 @@
 <body>
 
 <header class="navbar">
-    <a href="/" class="logo">FUZZI FILMS</a>
+    <a href="/" class="logo">Koregh Store</a>
     <div class="nav-actions">
         <a href="/dashboard" class="btn btn-ghost">&#8592; Dashboard</a>
         <a href="/painel/pedidos" class="btn btn-ghost">Pedidos</a>
@@ -112,7 +112,7 @@
         <span class="filtros-label">Filtrar por ação</span>
         <select name="tipo" class="tipo-select">
             <option value="">Todas as ações</option>
-            <option th:each="t : ${T(com.fuzzyfilms.ecommerce.model.AuditLog.TipoAcao).values()}"
+            <option th:each="t : ${T(com.koreghstore.ecommerce.model.AuditLog.TipoAcao).values()}"
                     th:value="${t}"
                     th:text="${t}"
                     th:selected="${t.name() == tipoSelecionado}">TIPO</option>

@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Pedidos — FUZZI FILMS</title>
+    <title>Pedidos — Koregh Store</title>
     <link rel="stylesheet" th:href="@{/css/main.css}">
     <style>
         .admin-page { max-width: 1200px; margin: 0 auto; padding: 32px 24px 80px; }
@@ -64,7 +64,7 @@
 <body>
 
 <header class="navbar">
-    <a href="/" class="logo">FUZZI FILMS</a>
+    <a href="/" class="logo">Koregh Store</a>
     <div class="nav-actions">
         <a href="/painel" class="btn btn-ghost">&#8592; Painel</a>
         <a href="/painel/usuarios" class="btn btn-ghost">Usuários</a>
@@ -91,7 +91,7 @@
         <span class="filtros-label">Filtrar por status</span>
         <select name="status" class="status-select">
             <option value="">Todos os pedidos</option>
-            <option th:each="s : ${T(com.fuzzyfilms.ecommerce.model.Pedido.StatusPedido).values()}"
+            <option th:each="s : ${T(com.koreghstore.ecommerce.model.Pedido.StatusPedido).values()}"
                     th:value="${s}"
                     th:text="${s}"
                     th:selected="${param.status != null && param.status[0] == s.name()}">Status</option>
